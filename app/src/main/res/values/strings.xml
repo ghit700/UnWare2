@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name">UnWare</string>
+    <string name="permissions_fail">您之前拒绝了部分权限，请允许权限以保障功能运行</string>
+    <string name="main_progress_title">获取数据中</string>
+    <string name="main_progress_content">请稍候...</string>
+    <string name="main_progress_post_title">上传数据中</string>
+    <string name="main_cancel">取消</string>
+    <string name="no_find_store_house_data">没有查找到仓库数据，请设置仓库再进行操作</string>
+    <string name="default_error_request">获取数据失败</string>
+    <!--欢迎光临-->
+    <string name="welcome_people">welcome_chose_people.wav</string>
+    <!--拿错签-->
+    <string name="take_rfid_error">take-rfid-error.wav</string>
+    <!--查询条形码-->
+    <string name="query_barcode_scan">query.wav</string>
+
+    <!--setting-->
+    <string name="setting_warning">还没保存仓库信息，是否确定退出</string>
+    <string name="setting_agree">确认</string>
+    <string name="setting_dailog_title">警告</string>
+    <!--pick-->
+    <string name="pick_list_warning">确定要开始领料？ 领料中途不能离开！</string>
+    <string name="pick_list_agree">确认</string>
+    <string name="pick_list_dailog_title">提示</string>
+    <string name="pick_list_lauch_content">正在识别领料用户，请稍等</string>
+    <string name="pick_list_detail_scan">识别中，请稍等</string>
+    <string name="pick_list_take_photo_error">识别失败，请重新点击</string>
+    <string name="pick_list_detail_rfid_list_title">Rfid明细</string>
+    <string name="pick_detail_rfid_match">正在识别错误的rfid码，请稍等</string>
+    <string name="pick_detail_no_all">还有一些货品未识别，如该货品确实已拿，可以选择强制退出</string>
+    <string name="pick_detail_finish">所有物品已领取完成，确定提交？</string>
+    <string name="pick_detail_no_all_btn_negative_text">继续领料</string>
+    <string name="pick_detail_no_all_btn_positive_text">强制退出</string>
+    <string name="pick_detail_finish_title">提示</string>
+    <string name="pick_detail_upload_data">正在上传数据，请稍等</string>
+    <string name="pick_rfid_connection_fail">rfid连接失败</string>
+    <!--deliver-->
+    <string name="deliver_order_id_hint">请输入订购单上的数字(如2018-063或18560)</string>
+    <string name="deliver_no_post_card_hint">请贴卡</string>
+    <!--update-->
+    <string name="update_alert_title">更新内容</string>
+    <string name="update_progress_title">下载更新</string>
+    <string name="update_progress_content">下载中...</string>
+    <string name="update_alert_install_title">安装</string>
+    <string name="update_alert_install_content">是否安装？</string>
+    <string name="update_download_fail">下载失败</string>
+
+
+</resources>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#3F51B5</color>
+    <color name="white">#fff</color>
+
+    <color name="bg_blue">#446189</color>   <!--背景颜色-->BF5252
+    <color name="text_check_list">#FFFF66</color>
+    <color name="text_search">#0066FF</color>
+
+    <color name="bg_waring_common">#FF3333</color>
+    <color name="bg_waring_press">#FF0033</color>
+
+    <color name="bg_clear_common">#0099FF</color>
+    <color name="bg_clear_press">#0099CC</color>
+
+    <color name="bg_submit_common">#00FF99</color>
+    <color name="bg_submit_press">#00FF66</color>
+</resources>
