@@ -61,4 +61,10 @@ public class User implements Serializable {
     public void setKeeper(boolean keeper) {
         isKeeper = keeper;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        User user= (User) obj;
+        return this.id.equals(user.getId());
+    }
 }

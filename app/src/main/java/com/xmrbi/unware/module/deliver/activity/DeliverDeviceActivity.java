@@ -63,6 +63,10 @@ public class DeliverDeviceActivity extends BaseActivity {
      * 货架ids
      */
     private String mDrawerIds;
+    /**
+     * 第一次获取设备数据需要显示对话框
+     */
+    private MaterialDialog mQueryDialog;
 
     public static void lauch(Context context, String assetCode) {
         Bundle bundle = new Bundle();
@@ -119,6 +123,15 @@ public class DeliverDeviceActivity extends BaseActivity {
      * 下载该资产编号包含的设备(10s刷新)
      */
     private void intervalDownloadDeliverGoods() {
+        if(mLstDevices.size()==0 ){
+            mQueryDialog = new MaterialDialog.Builder(mContext)
+                    .title(R.string.main_progress_title)
+                    .content(R.string.main_progress_content)
+                    .progress(true, 0)
+                    .progressIndeterminateStyle(false)
+                    .show();
+        }
+
         Observable.interval(0, 10, TimeUnit.SECONDS)
                 .flatMap(new Function<Long, ObservableSource<Response<List<Device>>>>() {
                     @Override
@@ -133,6 +146,15 @@ public class DeliverDeviceActivity extends BaseActivity {
                         mLstDevices.addAll(data);
                         setPlaceCount();
                         mAdapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        super.onComplete();
+                        if(mQueryDialog!=null){
+                            mQueryDialog.dismiss();
+                        }
+
                     }
                 });
     }
@@ -236,7 +258,7 @@ public class DeliverDeviceActivity extends BaseActivity {
      * @param drawerNames
      */
     private void updateDeviceDrawer(final long deviceId, String drawerNames) {
-        mDeliverRepository.updateDeviceDrawer(deviceId, drawerNames)
+        mDeliverRepository.updateDeviceDrawer(deviceId, drawerNames,mMainLocalSource.getStoreHouse().getId())
                 .subscribe(new ResponseObserver<String>() {
                     @Override
                     public void handleData(String data) {

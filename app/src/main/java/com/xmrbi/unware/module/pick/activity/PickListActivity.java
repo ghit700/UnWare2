@@ -156,6 +156,27 @@ public class PickListActivity extends BaseActivity {
 
     }
 
+    @Override
+    protected void onDestroy() {
+        try {
+            if (mRfidClient != null) {
+                // 结束读卡
+                if (mRfidClient.getStatus() != 0) {
+                    mRfidClient.stop();
+                    // 结束读取rfid标签
+                    mRfidClient.disconnect();
+                }
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        super.onDestroy();
+
+    }
+
     /**
      * 获取领料成功的rfid列表
      */
@@ -376,7 +397,6 @@ public class PickListActivity extends BaseActivity {
      */
     private void showScanResultDialog(List<Rfid> data) {
         MediaUtils.getInstance().stop();
-        MediaUtils.getInstance().play(R.string.take_rfid_error);
         new MaterialDialog.Builder(mContext)
                 .title(R.string.pick_list_detail_rfid_list_title)
                 .items(data)

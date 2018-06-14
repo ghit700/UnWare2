@@ -17,7 +17,7 @@ import io.reactivex.disposables.Disposable;
  */
 
 public abstract class BaseObserver<T> implements Observer<T> {
-    protected MaterialDialog mDialog;
+    public MaterialDialog mDialog;
     private Context mContext;
     /**
      * 是否显示错误信息的toast

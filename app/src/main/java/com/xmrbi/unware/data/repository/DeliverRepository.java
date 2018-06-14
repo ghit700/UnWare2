@@ -32,8 +32,8 @@ public class DeliverRepository extends BaseRepository {
                 .compose(new IOTransformer<Response<List<Drawer>>>(mBaseActivity));
     }
 
-   public Observable<Response<String>> updateDeviceDrawer(long deviceId, String drawerNames) {
-        return mDeliverRemoteSource.updateDeviceDrawer(deviceId, drawerNames)
+   public Observable<Response<String>> updateDeviceDrawer(long deviceId, String drawerNames,long storeHouseId) {
+        return mDeliverRemoteSource.updateDeviceDrawer(deviceId, drawerNames,storeHouseId)
                 .compose(new IOTransformer<Response<String>>(mBaseActivity));
     }
 

@@ -155,43 +155,45 @@ public class UpdateUtils {
      * @return
      */
     public void updateAPK() {
-        Observable.create(new ObservableOnSubscribe<Boolean>() {
-            @Override
-            public void subscribe(@io.reactivex.annotations.NonNull ObservableEmitter<Boolean> event) throws Exception {
-                try {
-                    //判断是否需要升级
-                    String mUrl = Config.Http.UPDATE_APK_UPDATE_FILE;
-                    URL url = new URL(mUrl);
-                    HttpURLConnection conn = (HttpURLConnection) url
-                            .openConnection();
-                    conn.setConnectTimeout(5000);
-                    conn.setReadTimeout(12000);
-                    InputStream is = conn.getInputStream();
-                    UpdateInfo info = getUpdataInfo(is);
-                    String versionName = getVersionName();
-                    if (versionName.compareTo(info.getVersion()) == 0) {
-                        //不用升级
-                        event.onNext(false);
-                    } else if (versionName.compareTo(info.getVersion()) < 0) {
-                        event.onNext(true);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    event.onComplete();
-                }
-            }
-        })
-                .compose(new IOTransformer<Boolean>(mActivity))
-                .subscribe(new Consumer<Boolean>() {
-                    @Override
-                    public void accept(Boolean isUpdate) throws Exception {
-                        if (isUpdate) {
-                            mAlertDialog.setContent(mInfo.getDescription());
-                            mAlertDialog.show();
+        if(mAlertDialog==null||mProgressDialog==null||(!mAlertDialog.isShowing()&&!mProgressDialog.isShowing())){
+            Observable.create(new ObservableOnSubscribe<Boolean>() {
+                @Override
+                public void subscribe(@io.reactivex.annotations.NonNull ObservableEmitter<Boolean> event) throws Exception {
+                    try {
+                        //判断是否需要升级
+                        String mUrl = Config.Http.UPDATE_APK_UPDATE_FILE;
+                        URL url = new URL(mUrl);
+                        HttpURLConnection conn = (HttpURLConnection) url
+                                .openConnection();
+                        conn.setConnectTimeout(5000);
+                        conn.setReadTimeout(12000);
+                        InputStream is = conn.getInputStream();
+                        UpdateInfo info = getUpdataInfo(is);
+                        String versionName = getVersionName();
+                        if (versionName.compareTo(info.getVersion()) == 0) {
+                            //不用升级
+                            event.onNext(false);
+                        } else if (versionName.compareTo(info.getVersion()) < 0) {
+                            event.onNext(true);
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        event.onComplete();
                     }
-                });
+                }
+            })
+                    .compose(new IOTransformer<Boolean>(mActivity))
+                    .subscribe(new Consumer<Boolean>() {
+                        @Override
+                        public void accept(Boolean isUpdate) throws Exception {
+                            if (isUpdate) {
+                                mAlertDialog.setContent(mInfo.getDescription());
+                                mAlertDialog.show();
+                            }
+                        }
+                    });
+        }
 
 
     }

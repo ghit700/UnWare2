@@ -109,7 +109,7 @@ public class Rfid {
         if (StringUtils.isEmpty(code)) {
             code = "";
         }else{
-            code=code.substring(code.indexOf("A"));
+            code=code.substring(code.lastIndexOf("A"));
         }
         if (isNeed) {
             return "未拿：" + name + "-" + code;

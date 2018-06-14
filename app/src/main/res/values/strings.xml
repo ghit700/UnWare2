@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">UnWare</string>
+    <string name="app_name">无人值守仓库</string>
     <string name="permissions_fail">您之前拒绝了部分权限，请允许权限以保障功能运行</string>
     <string name="main_progress_title">获取数据中</string>
     <string name="main_progress_content">请稍候...</string>

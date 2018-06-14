@@ -7,15 +7,18 @@ import android.widget.TextView;
 import com.xmrbi.unware.R;
 import com.xmrbi.unware.base.BaseActivity;
 import com.xmrbi.unware.data.entity.main.User;
+import com.xmrbi.unware.event.UserEvent;
 import com.xmrbi.unware.module.check.activity.CheckListActivity;
 import com.xmrbi.unware.module.deliver.activity.DeliverInputActivity;
 import com.xmrbi.unware.module.pick.activity.PickListActivity;
 import com.xmrbi.unware.module.search.activity.BarcodeScanActivity;
 import com.xmrbi.unware.utils.ActivityStackUtils;
 import com.xmrbi.unware.utils.MediaUtils;
+import com.xmrbi.unware.utils.RxBus;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import io.reactivex.functions.Consumer;
 
 /**
  * rifd仓库的功能选择页面
@@ -53,6 +56,17 @@ public class RfidStoreHouseActivity extends BaseActivity {
     @Override
     protected void initEventAndData() {
         mUser = (User) mBundle.getSerializable("user");
+        RxBus.getDefault().toObservable(UserEvent.class)
+                .compose(this.<UserEvent>bindToLifecycle())
+                .subscribe(new Consumer<UserEvent>() {
+                    @Override
+                    public void accept(UserEvent userEvent) throws Exception {
+                        //如果当前在库人员不包含当前操作人员，直接退出到主界面
+                        if(!userEvent.getLstUsers().contains(mUser)){
+                            ActivityStackUtils.finishAllActivity(RfidStoreHouseActivity.this);
+                        }
+                    }
+                });
     }
 
     @Override

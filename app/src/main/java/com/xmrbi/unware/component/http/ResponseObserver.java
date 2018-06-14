@@ -43,6 +43,7 @@ public abstract class ResponseObserver<T> extends BaseObserver<Response> {
         } else {
             handleData((T) response.getData());
         }
+        onComplete();
     }
 
     @Override

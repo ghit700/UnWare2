@@ -44,5 +44,5 @@ public interface DeliverRemoteSource {
      */
     @FormUrlEncoded
     @POST("/storehouse/delivery/delivery/mobileUpdateDeviceDrawer")
-    Observable<Response<String>> updateDeviceDrawer(@Field("deviceId") long deviceId, @Field("drawerNames")String drawerNames);
+    Observable<Response<String>> updateDeviceDrawer(@Field("deviceId") long deviceId, @Field("drawerNames")String drawerNames,@Query("storeHouseId")long storeHouseId);
 }

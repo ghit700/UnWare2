@@ -42,7 +42,7 @@ public class ActivityStackUtils {
         if (allActivities != null) {
             synchronized (allActivities) {
                 for (Activity act : allActivities) {
-                    if(!act.getClass().getName().equals(activity.getClass().getName())){
+                    if(!act.getClass().getName().equals("com.xmrbi.unware.module.main.activity.MainActivity")){
                         act.finish();
                     }
                 }
@@ -60,5 +60,13 @@ public class ActivityStackUtils {
         Intent intent=new Intent(context,clazz);
         intent.putExtras(bundle);
         context.startActivity(intent);
+    }
+
+    public static Set<Activity> getAllActivities() {
+        return allActivities;
+    }
+
+    public static void setAllActivities(Set<Activity> allActivities) {
+        ActivityStackUtils.allActivities = allActivities;
     }
 }

@@ -25,6 +25,7 @@ import com.xmrbi.unware.data.entity.main.User;
 import com.xmrbi.unware.data.local.MainLocalSource;
 import com.xmrbi.unware.data.repository.MainRepository;
 import com.xmrbi.unware.event.SettingEvent;
+import com.xmrbi.unware.event.UserEvent;
 import com.xmrbi.unware.module.main.adapter.UserAdapter;
 import com.xmrbi.unware.module.setting.activity.SettingActivity;
 import com.xmrbi.unware.utils.ActivityStackUtils;
@@ -62,6 +63,7 @@ public class MainActivity extends BaseActivity {
      * 请求在库人员的订阅，在设置页面的时候停止
      */
     private Disposable mDisposable;
+    private UpdateUtils mUpdateUtils;
 
     @Override
     protected int getLayout() {
@@ -100,10 +102,9 @@ public class MainActivity extends BaseActivity {
         //初始化
         mMainLocalSource = new MainLocalSource();
         mMainRepository = new MainRepository(this);
+        mUpdateUtils=new UpdateUtils(mContext);
         //定时查询在库人员
         queryStoreHouseUser();
-        //更新apk
-        new UpdateUtils(mContext).updateAPK();
         //接收设置修改事件
         RxBus.getDefault()
                 .toObservable(SettingEvent.class)
@@ -120,7 +121,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        closeAllScreen(true);
+        closeAllScreen(false);
     }
 
     /**
@@ -147,11 +148,11 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void accept(Long time) throws Exception {
                         if (mStoreHouse != null) {
-
                             mMainRepository.queryStoreHouseUser(mStoreHouse.getId())
-                                    .subscribe(new ResponseObserver<List<User>>(MainActivity.this,false,false) {
+                                    .subscribe(new ResponseObserver<List<User>>(MainActivity.this, false, false) {
                                         @Override
                                         public void handleData(List<User> data) {
+                                            RxBus.getDefault().post(new UserEvent(data));
                                             mLstUsers.clear();
                                             mLstUsers.addAll(data);
                                             mAdapter.notifyDataSetChanged();
@@ -169,6 +170,15 @@ public class MainActivity extends BaseActivity {
                                         protected void onError(ExceptionHandle.ResponeThrowable e) {
                                             super.onError(e);
                                             findNonUserOrError();
+                                        }
+
+                                        @Override
+                                        public void onComplete() {
+                                            if (ActivityStackUtils.getAllActivities().size() == 1) {
+                                                //更新apk
+                                                mUpdateUtils.updateAPK();
+                                            }
+                                            super.onComplete();
                                         }
                                     });
                         }

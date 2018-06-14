@@ -98,8 +98,8 @@ public class TTLUtils {
                 }
             }
             mTtlFactory.PrintText("\r\n", "3", "1", 0);
-            mTtlFactory.PrintBarcode(String.valueOf(order.getId()), 9, 80, 8, 0);
-            mTtlFactory.PrintText("\r\n", "3", "1", 0);
+//            mTtlFactory.PrintBarcode(String.valueOf(order.getId()), 9, 80, 8, 0);
+//            mTtlFactory.PrintText("\r\n", "3", "1", 0);
 //            mTtlFactory.PrintText("\r\n", "3", "1", 0);
             mTtlFactory.PrintText("\r\n_________________________________", "3", "1", 0);
         }
@@ -124,14 +124,14 @@ public class TTLUtils {
         mTtlFactory.PrintText("", "2", "1", 0);
         mTtlFactory.PrintText("日期:" + dateNowStr, "1", "1", 0);
         mTtlFactory.PrintText("\n", "3", "1", 0);
-        mTtlFactory.PrintText("送货单位：" + lstDevices.get(0).getBrandName(), "1", "1", 0);
+//        mTtlFactory.PrintText("送货单位：" + lstDevices.get(0).getBrandName(), "1", "1", 0);
         mTtlFactory.PrintText("", "2", "1", 0);
 //        mTtlFactory.PrintText("事物编号："+device.getBsnum(), "1", "1", 0);
         mTtlFactory.PrintText("", "2", "1", 0);
 //        mTtlFactory.PrintText("送货单位：养护部", "1", "1", 0);
 //        mTtlFactory.PrintText("", "2", "1", 0);
 //        mTtlFactory.PrintText("领料用途：养护物资", "1", "1", 0);
-        mTtlFactory.PrintText("\r\n", "3", "1", 0);
+//        mTtlFactory.PrintText("\r\n", "3", "1", 0);
         mTtlFactory.PrintText(" - - - - - - - - - - - - - - - -", "2", "1", 0);
         mTtlFactory.PrintText("送货清单", "2", "1", 0);
         mTtlFactory.PrintText("\r\n", "3", "1", 0);
@@ -147,10 +147,10 @@ public class TTLUtils {
 //        mTtlFactory.PrintText("", "2", "1", 0);
 //        mTtlFactory.PrintText("移动帧报警侦测系统 *10", "1", "1", 0);
         mTtlFactory.PrintText("\r\n", "3", "1", 0);
-        mTtlFactory.PrintText("\r\n", "3", "1", 0);
+//        mTtlFactory.PrintText("\r\n", "3", "1", 0);
         // mTtlFactory.PrintText("\r\n_________________________________", "3", "1", 0);
-        mTtlFactory.PrintBarcode(lstDevices.get(0).getAssetCode(), 9, 80, 8, 0);
-        mTtlFactory.PrintText("\r\n", "3", "1", 0);
+//        mTtlFactory.PrintBarcode(lstDevices.get(0).getAssetCode(), 9, 80, 8, 0);
+//        mTtlFactory.PrintText("\r\n", "3", "1", 0);
         mTtlFactory.PrintText("\r\n", "3", "1", 0);
         mTtlFactory.PrintText("\r\n_________________________________", "3", "1", 0);
     }

@@ -47,4 +47,13 @@ public interface PickRemoteSource {
     @POST("storehouse/delivery/requisition/mobileSaveStocks")
     Observable<Response<String>> endPick(@FieldMap Map<String, String> params);
 
+    /**
+     * 更新设备的rifd码扫描情况（也就是领料情况）
+     *
+     * @param rfid
+     * @param deviceId
+     * @return
+     */
+    @POST("gmms/modules/device/device!updatePickListRfid.action")
+    Observable<String>  updatePickListRfid(@Query("rfid") String rfid, @Query("deviceId") long deviceId, @Query("pickListId") long pickListId);
 }

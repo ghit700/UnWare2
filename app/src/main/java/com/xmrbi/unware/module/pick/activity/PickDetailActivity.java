@@ -52,6 +52,8 @@ import org.greenrobot.greendao.annotation.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -496,7 +498,7 @@ public class PickDetailActivity extends BaseActivity {
                 .subscribe(new ResponseObserver<List<Rfid>>(mContext, true, isShowProgress) {
                     @Override
                     public void handleData(@NotNull List<Rfid> data) {
-                        //错签加待领的rfid签
+                        //错签的rfid签
                         showScanResultDialog(data);
                     }
 
@@ -555,6 +557,12 @@ public class PickDetailActivity extends BaseActivity {
      * 显示扫描错签结果信息对话框
      */
     private void showScanResultDialog(List<Rfid> data) {
+        Collections.sort(data, new Comparator<Rfid>() {
+            @Override
+            public int compare(Rfid o1, Rfid o2) {
+                return o1.getCode().compareTo(o2.getCode());
+            }
+        });
         MediaUtils.getInstance().stop();
         MediaUtils.getInstance().play(R.string.take_rfid_error);
         mRfidListDialog.getBuilder().items(data);
