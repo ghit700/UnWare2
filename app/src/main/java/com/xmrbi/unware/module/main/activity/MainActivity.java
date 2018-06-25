@@ -27,6 +27,7 @@ import com.xmrbi.unware.data.repository.MainRepository;
 import com.xmrbi.unware.event.SettingEvent;
 import com.xmrbi.unware.event.UserEvent;
 import com.xmrbi.unware.module.main.adapter.UserAdapter;
+import com.xmrbi.unware.module.pick.activity.PickListActivity;
 import com.xmrbi.unware.module.setting.activity.SettingActivity;
 import com.xmrbi.unware.utils.ActivityStackUtils;
 import com.xmrbi.unware.utils.RxBus;
@@ -90,7 +91,7 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void initEventAndData() {
         //应用全屏显示
-        closeAllScreen(false);
+        closeAllScreen(true);
         //判断是否进入设置页面
         if (!SPUtils.getInstance(Config.SP.SP_NAME).getBoolean(Config.SP.SP_IS_SETTING)) {
             ActivityUtils.startActivity(MainActivity.this, SettingActivity.class);
@@ -156,6 +157,14 @@ public class MainActivity extends BaseActivity {
                                             mLstUsers.clear();
                                             mLstUsers.addAll(data);
                                             mAdapter.notifyDataSetChanged();
+                                            if(ActivityStackUtils.getAllActivities().size()==1){
+                                                User user=data.get(0);
+                                                if(user.isKeeper()){
+                                                    RfidStoreHouseActivity.lauch(mContext, user);
+                                                }else{
+                                                    PickListActivity.lauch(mContext,user);
+                                                }
+                                            }
                                         }
 
                                         //没有查询到用户

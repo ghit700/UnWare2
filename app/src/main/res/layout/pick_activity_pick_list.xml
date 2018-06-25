@@ -22,17 +22,17 @@
     <Button
         android:id="@+id/btnPickExit"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/dip_70"
+        android:layout_marginBottom="16dp"
         android:layout_marginEnd="16dp"
         android:layout_marginStart="8dp"
         android:background="@drawable/btn_bg_common"
         android:gravity="center"
         android:text="离开仓库"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="@+id/ivPickBack"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/ivPickBack"
-        app:layout_constraintTop_toTopOf="@+id/ivPickBack" />
+        app:layout_constraintStart_toEndOf="@+id/ivPickBack" />
 
     <ImageView
         android:layout_width="@dimen/dip_60"

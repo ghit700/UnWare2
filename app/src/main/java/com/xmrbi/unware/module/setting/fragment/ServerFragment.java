@@ -28,6 +28,7 @@ import com.xmrbi.unware.data.local.MainLocalSource;
 import com.xmrbi.unware.data.repository.MainRepository;
 import com.xmrbi.unware.event.SettingEvent;
 import com.xmrbi.unware.module.main.activity.MainActivity;
+import com.xmrbi.unware.utils.ActivityStackUtils;
 import com.xmrbi.unware.utils.RxBus;
 
 import java.util.ArrayList;
@@ -73,6 +74,8 @@ public class ServerFragment extends BaseFragment {
     EditText etSettingCodePrintBaudRate;
     @BindView(R.id.etSettingCodePrintSerialAddress)
     EditText etSettingCodePrintSerialAddress;
+    @BindView(R.id.tvSettingExit)
+    TextView tvSettingExit;
 
     private MainRepository mMainRepository;
     private MainLocalSource mMainLocalSource;
@@ -282,6 +285,14 @@ public class ServerFragment extends BaseFragment {
                     }
                 });
 
+    }
+
+    private int mCount=0;
+    @OnClick(R.id.tvSettingExit)
+    public void exitWareHouse(){
+        if(mCount++>10){
+            ActivityStackUtils.finishAllActivity();
+        }
     }
 
 }

@@ -74,12 +74,13 @@ public class Config {
         /**
          * 服务器地址
          */
-        public static String SERVER_IP = "http://192.168.4.21:8787/";
+//        public static String SERVER_IP = "http://192.168.4.21:8787/";
+        public static String SERVER_IP = "http://172.20.60.40:8787/";
         /**
          * gmms地址
          */
-//        public static final String SERVER_GMMS="http://192.168.0.101:8844/";
-        public static String SERVER_GMMS = "http://172.16.53.226:8080/";
+        public static  String SERVER_GMMS="http://172.20.60.40:8280/";
+//        public static String SERVER_GMMS = "http://172.16.53.226:8080/";
         //        public static final String SERVER_GMMS="http://172.16.53.226:8080/";
         public static final boolean IS_IP_ADDRESS = true;
 

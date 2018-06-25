@@ -2,6 +2,7 @@ package com.xmrbi.unware.module.main.activity;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.xmrbi.unware.R;
@@ -33,6 +34,8 @@ public class RfidStoreHouseActivity extends BaseActivity {
     TextView tvMainRfidSearch;
     @BindView(R.id.tvMainRfidCheck)
     TextView tvMainRfidCheck;
+    @BindView(R.id.imageView5)
+    ImageView imageView5;
 
     public static void lauch(Context context, User user) {
         Bundle bundle = new Bundle();
@@ -99,6 +102,14 @@ public class RfidStoreHouseActivity extends BaseActivity {
     public void lauchCheck() {
         if (mUser.isKeeper()) {
             lauch(CheckListActivity.class);
+        }
+    }
+
+    private int mCount=0;
+    @OnClick(R.id.imageView5)
+    public void exit(){
+        if(mCount++>10){
+            onBackPressed();
         }
     }
 }

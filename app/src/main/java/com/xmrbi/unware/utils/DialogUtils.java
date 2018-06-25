@@ -53,6 +53,33 @@ public class DialogUtils {
         }
         return builder.build();
     }
+    public static MaterialDialog alert(Context context, String title, String content, String positiveText, String negativeText, MaterialDialog.SingleButtonCallback callback,MaterialDialog.SingleButtonCallback callback1) {
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(context);
+        if (callback != null) {
+            builder.onPositive(callback);
+        }
+        if (callback != null) {
+            builder.onNegative(callback1);
+        }
+        if (!StringUtils.isEmpty(title)) {
+            builder.title(title);
+        }
+        if (!StringUtils.isEmpty(positiveText)) {
+            builder.positiveText(positiveText);
+        } else {
+            builder.positiveText(R.string.setting_agree);
+        }
+        if (!StringUtils.isEmpty(negativeText)) {
+            builder.negativeText(negativeText);
+        } else {
+            builder.negativeText(R.string.main_cancel);
+        }
+
+        if (!StringUtils.isEmpty(content)) {
+            builder.title(content);
+        }
+        return builder.build();
+    }
 
 
     public static MaterialDialog progress(Context context, String content) {

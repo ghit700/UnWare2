@@ -3,11 +3,13 @@ package com.xmrbi.unware.module.pick.activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -37,6 +39,8 @@ import com.xmrbi.unware.data.local.MainLocalSource;
 import com.xmrbi.unware.data.repository.MainRepository;
 import com.xmrbi.unware.data.repository.PickRepository;
 import com.xmrbi.unware.event.PickEvent;
+import com.xmrbi.unware.event.UserEvent;
+import com.xmrbi.unware.module.main.activity.RfidStoreHouseActivity;
 import com.xmrbi.unware.module.pick.adapter.PickOrderAdapter;
 import com.xmrbi.unware.utils.ActivityStackUtils;
 import com.xmrbi.unware.utils.CameraUtils;
@@ -126,6 +130,10 @@ public class PickListActivity extends BaseActivity {
             }
         });
         listPickOrder.setAdapter(mAdapter);
+        mUser = (User) mBundle.getSerializable("user");
+        if(!mUser.isKeeper()){
+            ivPickBack.setLayoutParams(new ConstraintLayout.LayoutParams(1,1));
+        }
 
     }
 
@@ -135,7 +143,6 @@ public class PickListActivity extends BaseActivity {
         mStoreHouse = mMainLocalSource.getStoreHouse();
         mPickRepository = new PickRepository(this);
         mMainRepository = new MainRepository(this);
-        mUser = (User) mBundle.getSerializable("user");
         tvPickWelcome.setText(mUser.getName() + ",欢迎光临" + mStoreHouse.getName() + "无人值守仓库");
         //后台拍照
         mCameraUtils = new CameraUtils(svPickTakePhoto);
@@ -151,6 +158,18 @@ public class PickListActivity extends BaseActivity {
                     @Override
                     public void accept(PickEvent pickEvent) throws Exception {
                         getPickSuccessListRfidCodes();
+                    }
+                });
+
+        Disposable d1=RxBus.getDefault().toObservable(UserEvent.class)
+                .compose(this.<UserEvent>bindToLifecycle())
+                .subscribe(new Consumer<UserEvent>() {
+                    @Override
+                    public void accept(UserEvent userEvent) throws Exception {
+                        //如果当前在库人员不包含当前操作人员，直接退出到主界面
+                        if(!userEvent.getLstUsers().contains(mUser)){
+                            ActivityStackUtils.finishAllActivity(PickListActivity.this);
+                        }
                     }
                 });
 
@@ -283,8 +302,8 @@ public class PickListActivity extends BaseActivity {
                         mRfidClient = new RfidClient(rfidIp, rfidPort);
                         try {
                             if (mRfidClient.connect()) {
-                                //50次单次扫描
-                                return Observable.range(1, 50);
+                                //10次单次扫描
+                                return Observable.range(1, 10);
                             } else {
                                 return Observable.just(-1);
 
@@ -307,7 +326,7 @@ public class PickListActivity extends BaseActivity {
                                     rfidList = mRfidClient.startRead();
                                     if (rfidList != null && !rfidList.isEmpty()) {
                                         for (String code : rfidList) {
-                                            if (!mRfidCodes.contains(code) && RfidUtils.isAccord(code) && !errorCodes.toString().contains(code)) {
+                                            if ((StringUtils.isEmpty(mRfidCodes)||!mRfidCodes.contains(code)) && RfidUtils.isAccord(code) && !errorCodes.toString().contains(code)) {
                                                 errorCodes.append(",").append(code);
                                             }
                                         }
@@ -329,7 +348,7 @@ public class PickListActivity extends BaseActivity {
                         if (count < 0) {
                             //rfid连接失败
                             ToastUtils.showLong(R.string.pick_rfid_connection_fail);
-                        } else if (count == 50) {
+                        } else if (count == 10) {
                             scanDialog.dismiss();
                             //含有错签
                             if (errorCodes != null && !StringUtils.isEmpty(errorCodes.toString()) && errorCodes.length() > 0) {
@@ -351,7 +370,7 @@ public class PickListActivity extends BaseActivity {
      */
     private void openDoor() {
         mMainRepository.remoteCtrlIO(mStoreHouse.getId(), null, null, "door", true)
-                .subscribe(new BaseObserver<String>(this) {
+                .subscribe(new BaseObserver<String>(this,false,false) {
                     @Override
                     public void onNext(@io.reactivex.annotations.NonNull String result) {
                         if (!StringUtils.isEmpty(result)) {
@@ -370,13 +389,27 @@ public class PickListActivity extends BaseActivity {
      *
      * @param rfids
      */
-    private void showRfidDetail(String rfids, boolean isShowProgress) {
+    private void showRfidDetail(final String rfids, boolean isShowProgress) {
         mMainRepository.showRfidDetail(rfids)
-                .subscribe(new ResponseObserver<List<Rfid>>(mContext, true, isShowProgress) {
+                .subscribe(new ResponseObserver<List<Rfid>>(mContext, false, isShowProgress) {
                     @Override
                     public void handleData(@NotNull List<Rfid> data) {
                         //错签加待领的rfid签
                         showScanResultDialog(data);
+                    }
+
+                    @Override
+                    protected void handleErrorData() {
+                        super.handleErrorData();
+                        String[] lstCodes=rfids.split(",");
+                        List<Rfid> lstRfids=new ArrayList<>();
+                        for (String code:lstCodes) {
+                            if(!StringUtils.isEmpty(code)){
+                                Rfid rfid = new Rfid(code,"", false, "");
+                                lstRfids.add(rfid);
+                            }
+                        }
+                        showScanResultDialog(lstRfids);
                     }
 
                     @Override

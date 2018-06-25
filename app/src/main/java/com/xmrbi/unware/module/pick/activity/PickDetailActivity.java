@@ -51,6 +51,7 @@ import org.greenrobot.greendao.annotation.NotNull;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -167,6 +168,10 @@ public class PickDetailActivity extends BaseActivity {
      * 扫描线程
      */
     private Disposable mScanDisposable;
+    /**
+     * 获取领料单明细扫描得到的rfid
+     */
+    private Disposable mRfidDisposable;
     private String mLightDrawer;
     /**
      * 有rfid标签的设备（明细id集合）
@@ -298,7 +303,7 @@ public class PickDetailActivity extends BaseActivity {
                                     mlstRfids += "," + detail.getRfidCode();
                                 }
                                 //如果已经扫描到的rfid包含rfid明细的code，那代表这个码已经扫到了
-                                if(!StringUtils.isEmpty(detail.getRfid())&&detail.getRfid().contains(detail.getRfidCode())){
+                                if (!StringUtils.isEmpty(detail.getRfid()) && detail.getRfid().contains(detail.getRfidCode())) {
                                     mScanTotal++;
                                 }
                                 mRfidDetailIds += "," + detail.getId();
@@ -358,6 +363,8 @@ public class PickDetailActivity extends BaseActivity {
                         lightControl(mDrawerIds, true);
                         //开始rfid扫描
                         startRfidScan();
+                        //循环获取
+                        intervalQueryPickListDetailCodes();
                     }
                 });
     }
@@ -448,6 +455,43 @@ public class PickDetailActivity extends BaseActivity {
     }
 
     /**
+     * 轮询领料单明细，获取已经扫描到的rfid
+     */
+    private void intervalQueryPickListDetailCodes() {
+        Observable.interval(0, 10, TimeUnit.SECONDS)
+                .flatMap(new Function<Long, ObservableSource<Response<List<PickListDetail>>>>() {
+                    @Override
+                    public ObservableSource<Response<List<PickListDetail>>> apply(Long aLong) throws Exception {
+                        return mPickRepository.downloadPickListDetail(mUser.getId(), mStoreHouse.getId(), mOrder.getId());
+                    }
+                })
+                .subscribe(new ResponseObserver<List<PickListDetail>>(mContext, false, false) {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                        super.onSubscribe(d);
+                        mRfidDisposable = d;
+                    }
+
+                    @Override
+                    public void handleData(List<PickListDetail> data) {
+                        List<String> lstRfids = new ArrayList<>();
+                        for (PickListDetail pick : data) {
+                            if (!StringUtils.isEmpty(pick.getRfid())) {
+                                String[] rfids = pick.getRfid().split(",");
+                                for (String code : rfids) {
+                                    if (!lstRfids.contains(code)) {
+                                        lstRfids.add(code);
+                                    }
+
+                                }
+                            }
+                        }
+                        matchRfids(lstRfids);
+                    }
+                });
+    }
+
+    /**
      * 匹配搜索得到的rfid码
      *
      * @param rfidList
@@ -493,13 +537,27 @@ public class PickDetailActivity extends BaseActivity {
      *
      * @param rfids
      */
-    private void showRfidDetail(String rfids, boolean isShowProgress) {
+    private void showRfidDetail(final String rfids, boolean isShowProgress) {
         mMainRepository.showRfidDetail(rfids)
-                .subscribe(new ResponseObserver<List<Rfid>>(mContext, true, isShowProgress) {
+                .subscribe(new ResponseObserver<List<Rfid>>(mContext, false, isShowProgress) {
                     @Override
                     public void handleData(@NotNull List<Rfid> data) {
                         //错签的rfid签
                         showScanResultDialog(data);
+                    }
+
+                    @Override
+                    protected void handleErrorData() {
+                        super.handleErrorData();
+                        String[] lstCodes=rfids.split(",");
+                        List<Rfid> lstRfids=new ArrayList<>();
+                        for (String code:lstCodes) {
+                            if(!StringUtils.isEmpty(code)){
+                                Rfid rfid = new Rfid(code,"", false, "");
+                                lstRfids.add(rfid);
+                            }
+                        }
+                        showScanResultDialog(lstRfids);
                     }
 
                     @Override
@@ -621,12 +679,12 @@ public class PickDetailActivity extends BaseActivity {
                 .progressIndeterminateStyle(false)
                 .canceledOnTouchOutside(false)
                 .show();
-        //扫描50次获取结果(延迟5s执行)
+        //扫描10次获取结果(延迟5s执行)
         Disposable d = Observable.timer(5, TimeUnit.SECONDS)
                 .flatMap(new Function<Long, ObservableSource<Integer>>() {
                     @Override
                     public ObservableSource<Integer> apply(Long aLong) {
-                        return Observable.range(1, 50);
+                        return Observable.range(1, 10);
                     }
                 })
                 .doOnNext(new Consumer<Integer>() {
@@ -660,7 +718,7 @@ public class PickDetailActivity extends BaseActivity {
                     @Override
                     public void accept(Integer count) throws Exception {
                         //循环50次，显示最终的识别结果
-                        if (count == 50) {
+                        if (count == 10) {
                             scanDialog.dismiss();
                             MaterialDialog dialog = null;
                             //含有错签
@@ -679,6 +737,11 @@ public class PickDetailActivity extends BaseActivity {
                                             @Override
                                             public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
                                                 uploadPickDetailData();
+                                            }
+                                        }, new MaterialDialog.SingleButtonCallback() {
+                                            @Override
+                                            public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
+                                                startRfidScan();
                                             }
                                         });
 
@@ -738,8 +801,16 @@ public class PickDetailActivity extends BaseActivity {
                         if (uploadResult.indexOf("id=") == 0) {
                             startAnnexId.append(uploadResult.substring(3, uploadResult.length() - 1));
                         }
+                        try{
+                            File file =new File(Config.FileConfig.PICK_PHOTO_DIR + mOrder.getBsnum() + "-start.jpg");
+                            if(file.exists()){
+                                file.delete();
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                         //上传结束领料图片
-                        return mMainRepository.imgUploadAnnex(new File(Config.FileConfig.PICK_PHOTO_DIR + mOrder.getBsnum() + "-start.jpg"), mUser.getId());
+                        return mMainRepository.imgUploadAnnex(new File(Config.FileConfig.PICK_PHOTO_DIR + mOrder.getBsnum() + "-end.jpg"), mUser.getId());
                     }
                 })
                 .flatMap(new Function<String, ObservableSource<Response<String>>>() {
@@ -747,6 +818,14 @@ public class PickDetailActivity extends BaseActivity {
                     public ObservableSource<Response<String>> apply(String uploadResult) throws Exception {
                         if (uploadResult.indexOf("id=") == 0) {
                             endAnnexId.append(uploadResult.substring(3, uploadResult.length() - 1));
+                        }
+                        try{
+                            File file =new File(Config.FileConfig.PICK_PHOTO_DIR + mOrder.getBsnum() + "-end.jpg");
+                            if(file.exists()){
+                                file.delete();
+                            }
+                        }catch (Exception e){
+                            e.printStackTrace();
                         }
                         //上传数据
                         Map<String, String> params = new HashMap<>();
@@ -789,7 +868,7 @@ public class PickDetailActivity extends BaseActivity {
                         //熄灭所有的灯
                         lightControl(mDrawerIds, false);
                         //打印回执单
-                        mTtlUtils.printPickNote(mStoreHouse.getName(),mUser,mOrder,mlstPickListDetails);
+                        mTtlUtils.printPickNote(mStoreHouse.getName(), mUser, mOrder, mlstPickListDetails);
                         //保存领取的rfid列表
                         if (mlstRfids.length() > 0) {
                             SPUtils.getInstance(Config.SP.SP_NAME).put(Config.SP.SP_RFID_CODES,
