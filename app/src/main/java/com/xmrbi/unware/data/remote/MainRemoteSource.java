@@ -3,6 +3,7 @@ package com.xmrbi.unware.data.remote;
 import com.xmrbi.unware.component.http.Response;
 import com.xmrbi.unware.data.entity.main.Rfid;
 import com.xmrbi.unware.data.entity.main.StoreHouseAioConfig;
+import com.xmrbi.unware.data.entity.main.StoreHouseDevice;
 import com.xmrbi.unware.data.entity.main.User;
 import com.xmrbi.unware.data.entity.main.Useunit;
 
@@ -74,7 +75,6 @@ public interface MainRemoteSource {
      * io控制接口（door门禁，light灯架）
      *
      * @param storeHouseId 仓库id
-     * @param drawerIds    货架id
      * @param ctrlType     io类型(door,light)
      * @param onOrOff      true亮，false暗
      * @return
@@ -88,4 +88,15 @@ public interface MainRemoteSource {
     @Multipart
     @POST("gmms/modules/disease/disease!imgUploadAnnex.action")
     Observable<String> imgUploadAnnex(@Part MultipartBody.Part imgFile,@Query("userId")long userId);
+
+    /**
+     * 获取仓库设备配置
+     * @param storeHouseId
+     * @param deviceType
+     * @param drawerIds
+     * @return
+     */
+    @GET("storehouse/device/mobileQueryStoreHouseDevice")
+    Observable<Response<List<StoreHouseDevice>>> queryStoreHouseDevice(@Query("storeHouseId")long storeHouseId,@Query("deviceType")long deviceType,@Query("drawerIds")String drawerIds);
 }
+

@@ -717,7 +717,7 @@ public class PickDetailActivity extends BaseActivity {
                 .subscribe(new Consumer<Integer>() {
                     @Override
                     public void accept(Integer count) throws Exception {
-                        //循环50次，显示最终的识别结果
+                        //循环10次，显示最终的识别结果
                         if (count == 10) {
                             scanDialog.dismiss();
                             MaterialDialog dialog = null;

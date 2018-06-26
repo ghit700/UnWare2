@@ -1,6 +1,7 @@
 package com.xmrbi.unware.data.repository;
 
 
+import com.google.zxing.common.StringUtils;
 import com.xmrbi.unware.base.BaseActivity;
 import com.xmrbi.unware.base.Config;
 import com.xmrbi.unware.component.http.IOTransformer;
@@ -8,15 +9,22 @@ import com.xmrbi.unware.component.http.Response;
 import com.xmrbi.unware.component.http.RetrofitHelper;
 import com.xmrbi.unware.data.entity.main.Rfid;
 import com.xmrbi.unware.data.entity.main.StoreHouseAioConfig;
+import com.xmrbi.unware.data.entity.main.StoreHouseDevice;
 import com.xmrbi.unware.data.entity.main.User;
 import com.xmrbi.unware.data.entity.main.Useunit;
 import com.xmrbi.unware.data.remote.MainRemoteSource;
+import com.xmrbi.unware.utils.EioUtils;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
+import io.reactivex.Scheduler;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -62,8 +70,70 @@ public class MainRepository extends BaseRepository {
                 .compose(new IOTransformer<String>(mBaseActivity));
     }
 
-    public Observable<String> remoteCtrlIO(long storeHouseId, String allDrawerIds, String operDrawerIds, String crtlType, boolean onOrOff) {
-        return mGmmsMainRemoteSource.remoteCtrlLight(storeHouseId, allDrawerIds, operDrawerIds, crtlType, onOrOff)
+//    public Observable<String> remoteCtrlIO(long storeHouseId, String allDrawerIds, String operDrawerIds, String crtlType, boolean onOrOff) {
+//        return mGmmsMainRemoteSource.remoteCtrlLight(storeHouseId, allDrawerIds, operDrawerIds, crtlType, onOrOff)
+//                .compose(new IOTransformer<String>(mBaseActivity));
+//    }
+    public Observable<String> remoteCtrlIO(long storeHouseId, String allDrawerIds, final String operDrawerIds, final String crtlType, final boolean onOrOff) {
+        return mainRemoteSource.queryStoreHouseDevice(storeHouseId, crtlType.equals("door")?6L:9L, allDrawerIds)
+                .subscribeOn(Schedulers.io())
+                .flatMap(new Function<Response<List<StoreHouseDevice>>, ObservableSource<String>>() {
+                    @Override
+                    public ObservableSource<String> apply(Response<List<StoreHouseDevice>> data) throws Exception {
+                        if(crtlType.equals("door")){
+                            //控门
+                            if(data.getData()!=null&&data.getData().size()>0){
+                                StoreHouseDevice device=data.getData().get(0);
+                                String[] controls=device.getCtrlNumber().split("-");
+                                EioUtils.ctrlDoor(device.getIpIn(),device.getPortIn(),onOrOff?Integer.parseInt(controls[0]):Integer.parseInt(controls[1]),controls.length>2?Integer.parseInt(controls[2]):0);
+                                return     Observable.just("success");
+                            }
+                            return  Observable.just("fail");
+
+                        }else{
+                            if(data.getData()!=null&&data.getData().size()>0) {
+                                List<StoreHouseDevice> lstDevices=data.getData();
+                                if(onOrOff){
+                                    //亮灯
+                                    String[] dark=operDrawerIds.split(",");
+                                    List<Integer> darkChannels=new ArrayList<>();
+                                    List<Integer> lightChannels=new ArrayList<>();
+                                    for(StoreHouseDevice device:lstDevices){
+                                        boolean isDark=true;
+                                        for (String id:dark) {
+                                            if(device.getDrawerIds().contains(id)){
+                                                lightChannels.add(Integer.parseInt(device.getCtrlNumber()));
+                                                isDark=false;
+                                                break;
+                                            }
+                                        }
+                                        if(isDark){
+                                            darkChannels.add(Integer.parseInt(device.getCtrlNumber()));
+                                        }
+                                    }
+                                    EioUtils.ctrlMultipleLight(lstDevices.get(0).getIpIn(),lstDevices.get(0).getPortIn(),lightChannels,darkChannels);
+                                }else{
+                                    //灭灯
+                                    String[] dark=operDrawerIds.split(",");
+                                    List<Integer> darkChannels=new ArrayList<>();
+                                    for(StoreHouseDevice device:lstDevices){
+                                        for (String id:dark) {
+                                            if(device.getDrawerIds().contains(id)){
+                                                darkChannels.add(Integer.parseInt(device.getCtrlNumber()));
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    EioUtils.ctrlMultipleLight(lstDevices.get(0).getIpIn(),lstDevices.get(0).getPortIn(),new ArrayList<Integer>(),darkChannels);
+                                }
+                                return Observable.just("success");
+                            }
+                            return  Observable.just("fail");
+
+                        }
+
+                    }
+                })
                 .compose(new IOTransformer<String>(mBaseActivity));
     }
 
@@ -75,8 +145,8 @@ public class MainRepository extends BaseRepository {
         } else {
             return Observable.just("文件不存在");
         }
-
     }
+
 
 }
 
