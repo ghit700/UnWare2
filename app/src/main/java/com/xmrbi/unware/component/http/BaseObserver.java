@@ -22,7 +22,7 @@ public abstract class BaseObserver<T> implements Observer<T> {
     /**
      * 是否显示错误信息的toast
      */
-    protected boolean isShowErrorToast = true;
+    protected boolean  isShowErrorToast = true;
     /**
      * 是否显示dailog
      */

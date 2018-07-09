@@ -757,20 +757,13 @@ public class PickDetailActivity extends BaseActivity {
                                             }
                                         });
                             }
-                            dialog.getBuilder().onNegative(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@android.support.annotation.NonNull MaterialDialog dialog, @android.support.annotation.NonNull DialogAction which) {
-                                    //重新开始搜索
-                                    startRfidScan();
-                                }
-                            });
-                            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-                                @Override
-                                public void onDismiss(DialogInterface dialog) {
-                                    //重新开始搜索
-                                    startRfidScan();
-                                }
-                            });
+//                            dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+//                                @Override
+//                                public void onDismiss(DialogInterface dialog) {
+//                                    //重新开始搜索
+//                                    startRfidScan();
+//                                }
+//                            });
                             dialog.setCanceledOnTouchOutside(false);
                             dialog.show();
                         }

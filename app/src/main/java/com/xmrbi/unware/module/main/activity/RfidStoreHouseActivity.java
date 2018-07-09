@@ -65,7 +65,7 @@ public class RfidStoreHouseActivity extends BaseActivity {
                     @Override
                     public void accept(UserEvent userEvent) throws Exception {
                         //如果当前在库人员不包含当前操作人员，直接退出到主界面
-                        if(!userEvent.getLstUsers().contains(mUser)){
+                        if (!userEvent.getLstUsers().contains(mUser)) {
                             ActivityStackUtils.finishAllActivity(RfidStoreHouseActivity.this);
                         }
                     }
@@ -94,7 +94,7 @@ public class RfidStoreHouseActivity extends BaseActivity {
     @OnClick(R.id.tvMainRfidSearch)
     public void lauchSearch() {
         if (mUser.isKeeper()) {
-//        lauch(BarcodeScanActivity.class);
+            BarcodeScanActivity.lauch(mContext,mUser.getId());
         }
     }
 
@@ -105,10 +105,11 @@ public class RfidStoreHouseActivity extends BaseActivity {
         }
     }
 
-    private int mCount=0;
+    private int mCount = 0;
+
     @OnClick(R.id.imageView5)
-    public void exit(){
-        if(mCount++>10){
+    public void exit() {
+        if (mCount++ > 10) {
             onBackPressed();
         }
     }

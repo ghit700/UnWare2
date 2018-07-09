@@ -8,6 +8,13 @@ import android.widget.TextView;
 import com.blankj.utilcode.util.ToastUtils;
 import com.xmrbi.unware.R;
 import com.xmrbi.unware.base.BaseActivity;
+import com.xmrbi.unware.component.http.ResponseObserver;
+import com.xmrbi.unware.data.entity.deliver.Device;
+import com.xmrbi.unware.data.entity.main.StoreHouse;
+import com.xmrbi.unware.data.local.MainLocalSource;
+import com.xmrbi.unware.data.repository.DeliverRepository;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -49,6 +56,10 @@ public class DeliverInputActivity extends BaseActivity {
     @BindView(R.id.btnDeliverSubmit)
     Button btnDeliverSubmit;
 
+    private DeliverRepository mDeliverRepository;
+    private MainLocalSource mMainLocalSource;
+    private StoreHouse mStoreHouse;
+
     @Override
     protected int getLayout() {
         return R.layout.deliver_activity_input;
@@ -56,7 +67,9 @@ public class DeliverInputActivity extends BaseActivity {
 
     @Override
     protected void onViewCreated() {
-
+        mDeliverRepository=new DeliverRepository(this);
+        mMainLocalSource=new MainLocalSource();
+        mStoreHouse=mMainLocalSource.getStoreHouse();
     }
 
     @Override
@@ -82,8 +95,23 @@ public class DeliverInputActivity extends BaseActivity {
     public void submit() {
         if ((tvDeliverOrderId.getText().toString().trim().contains("-") && tvDeliverOrderId.getText().toString().length() == 8) ||
                 (!tvDeliverOrderId.getText().toString().trim().contains("-") && tvDeliverOrderId.getText().toString().length() == 5)) {
-            DeliverDeviceActivity.lauch(mContext, tvDeliverOrderId.getText().toString().trim());
-            finish();
+            mDeliverRepository.downloadDeliverGoods(tvDeliverOrderId.getText().toString().trim(),mStoreHouse.getId())
+                    .subscribe(new ResponseObserver<List<Device>>(this,false,false) {
+                        @Override
+                        public void handleData(List<Device> data) {
+                            if(data.size()>0){
+                                DeliverDeviceActivity.lauch(mContext, tvDeliverOrderId.getText().toString().trim());
+                                finish();
+                            }
+                        }
+
+                        @Override
+                        protected void handleErrorData() {
+                            super.handleErrorData();
+                            ToastUtils.showLong("查无数据");
+                        }
+                    });
+
         }else{
             ToastUtils.showLong(getString(R.string.deliver_order_id_hint));
         }

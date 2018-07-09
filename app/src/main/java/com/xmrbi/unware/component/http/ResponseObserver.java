@@ -24,6 +24,10 @@ public abstract class ResponseObserver<T> extends BaseObserver<Response> {
         super(context);
     }
 
+    public ResponseObserver(Context context, boolean isPost) {
+        super(context, isPost);
+    }
+
     public ResponseObserver(Context mContext, boolean isShowErrorToast, boolean isShowDialog) {
         super(mContext, isShowErrorToast, isShowDialog);
     }

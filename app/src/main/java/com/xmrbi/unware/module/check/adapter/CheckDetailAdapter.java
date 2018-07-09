@@ -21,11 +21,9 @@ public class CheckDetailAdapter extends BaseQuickAdapter<RfidNewInventoryEntity,
     @Override
     protected void convert(BaseViewHolder helper, RfidNewInventoryEntity item) {
         helper.setText(R.id.tvCheckItemDrawer, item.getDrawerName());
-        int count = item.getNoRfidCheck() + item.getNoRfidUncheck() + item.getRfidCheck() + item.getRfidUncheck();
-        int checkCount = item.getNoRfidCheck() + item.getRfidCheck();
-        helper.setMax(R.id.pbCheckItemProgress, count);
-        helper.setProgress(R.id.pbCheckItemProgress, checkCount);
-        if(count==checkCount){
+        helper.setMax(R.id.pbCheckItemProgress, item.getCheck()+item.getNoCheck());
+        helper.setProgress(R.id.pbCheckItemProgress, item.getCheck());
+        if(item.getNoCheck()==0){
             helper.setVisible(R.id.ivCheckItemCheck,true);
         }else{
             helper.setVisible(R.id.ivCheckItemCheck,false);

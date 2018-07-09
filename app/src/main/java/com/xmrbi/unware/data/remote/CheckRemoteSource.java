@@ -19,7 +19,7 @@ public interface CheckRemoteSource {
      * @param storeHouseId
      * @return
      */
-    @GET("/storehouse/checkstore/checkstore/mobileCheckStoreDevicesForFive")
+    @GET("storehouse/checkstore/checkstore/mobileCheckStoreDevicesForFive")
     Observable<Response<List<CheckList>>> mobileCheckStoreDevicesForFive(@Query("storeHouseId") long storeHouseId);
     /**
      * 获取盘点单数据
@@ -27,6 +27,10 @@ public interface CheckRemoteSource {
      * @param checkId
      * @return
      */
-    @GET("gmms/modules/device/check-store-device!countCheckStoreDeviceItemOrRfid.action")
-    Observable<Response<List<RfidNewInventoryEntity>>> countCheckStoreDeviceItemOrRfid(@Query("checkId") long checkId);
+    @GET("storehouse/checkstore/checkstore/mobileCountCheckStoreDeviceItem")
+    Observable<Response<List<RfidNewInventoryEntity>>> mobileCountCheckStoreDeviceItem(@Query("checkId") long checkId);
+
+
+
+
 }

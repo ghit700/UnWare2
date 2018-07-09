@@ -26,9 +26,6 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
-import io.reactivex.Scheduler;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
@@ -93,7 +90,7 @@ public class CheckDetailActivity extends BaseActivity {
                 .flatMap(new Function<Long, ObservableSource<Response<List<RfidNewInventoryEntity>>>>() {
                     @Override
                     public ObservableSource<Response<List<RfidNewInventoryEntity>>> apply(Long aLong) throws Exception {
-                        return mCheckRepository.countCheckStoreDeviceItemOrRfid(mCheckId);
+                        return mCheckRepository.mobileCountCheckStoreDeviceItem(mCheckId);
                     }
                 })
                 .subscribe(new ResponseObserver<List<RfidNewInventoryEntity>>() {
@@ -104,8 +101,8 @@ public class CheckDetailActivity extends BaseActivity {
                         int checkCount=0;
                         int nonCheckCount=0;
                         for (RfidNewInventoryEntity entity:mlstRfidNewInventoryEntities) {
-                            checkCount+=entity.getNoRfidCheck()+entity.getRfidCheck();
-                            nonCheckCount+=entity.getRfidUncheck()+entity.getNoRfidUncheck();
+                            checkCount+=entity.getCheck();
+                            nonCheckCount+=entity.getNoCheck();
                         }
                         tvCheckDetailFinishCount.setText(String.valueOf(checkCount));
                         tvCheckDetailNonFinishCount.setText(String.valueOf(nonCheckCount));

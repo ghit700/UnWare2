@@ -52,7 +52,10 @@
         <activity android:name="com.xmrbi.unware.module.pick.activity.PickDetailActivity" />
         <activity android:name="com.xmrbi.unware.module.check.activity.CheckListActivity" />
         <activity android:name="com.xmrbi.unware.module.check.activity.CheckDetailActivity" />
-        <activity android:name="com.xmrbi.unware.module.search.activity.BarcodeScanActivity"/>
+        <activity android:name="com.xmrbi.unware.module.search.activity.BarcodeScanActivity"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
+        <activity android:name="com.xmrbi.unware.module.search.activity.BarcodeDetailActivity"/>
+
         <activity android:name="com.xmrbi.unware.module.deliver.activity.DeliverInputActivity"/>
         <activity android:name="com.xmrbi.unware.module.deliver.activity.DeliverDeviceActivity"
             android:windowSoftInputMode="stateAlwaysHidden"/>

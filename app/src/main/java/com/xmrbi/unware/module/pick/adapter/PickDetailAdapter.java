@@ -15,8 +15,15 @@ import java.util.List;
  */
 
 public class PickDetailAdapter extends BaseQuickAdapter<PickListDetail, BaseViewHolder> {
+    private Boolean isShowFinish = true;
+
     public PickDetailAdapter(@Nullable List<PickListDetail> data) {
         super(R.layout.pick_item_pick_detail, data);
+    }
+
+    public PickDetailAdapter(@Nullable List<PickListDetail> data, boolean isShowFinish) {
+        super(R.layout.pick_item_pick_detail, data);
+        this.isShowFinish = isShowFinish;
     }
 
     @Override
@@ -54,7 +61,7 @@ public class PickDetailAdapter extends BaseQuickAdapter<PickListDetail, BaseView
                 helper.setVisible(R.id.tvPickItemRfid, true);
                 helper.setText(R.id.tvPickItemRfid, item.getRfidCode());
             }
-            if (!StringUtils.isEmpty(item.getRfid()) && item.getRfidCode().length() == item.getRfid().length()) {
+            if (!StringUtils.isEmpty(item.getRfid()) && item.getRfidCode().length() == item.getRfid().length() && isShowFinish) {
                 helper.setVisible(R.id.ivPickItemCheckRight, true);
                 item.setRelation(true);
             }

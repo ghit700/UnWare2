@@ -300,7 +300,7 @@ public class DeliverDeviceActivity extends BaseActivity {
                             String printSerialName = config.getPrintSerialName();
                             String printBautRate = config.getPrintBautRate();
                             TTLUtils ttlUtils = new TTLUtils(printSerialName, printBautRate);
-                            ttlUtils.printDeliverNote(mStoreHouse.getName(), mlstOperateDevices);
+                            ttlUtils.printDeliverNote(mStoreHouse.getName(), mlstOperateDevices,mAssetCode);
                         }
 
                         @Override

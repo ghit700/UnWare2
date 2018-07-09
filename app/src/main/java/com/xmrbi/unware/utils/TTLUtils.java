@@ -98,14 +98,15 @@ public class TTLUtils {
                 }
             }
             mTtlFactory.PrintText("\r\n", "3", "1", 0);
-//            mTtlFactory.PrintBarcode(String.valueOf(order.getId()), 9, 80, 8, 0);
-//            mTtlFactory.PrintText("\r\n", "3", "1", 0);
-//            mTtlFactory.PrintText("\r\n", "3", "1", 0);
+            mTtlFactory.PrintBarcode(String.valueOf("pick"+order.getId()), 3,80,9,0);
+            mTtlFactory.PrintText("\r\n", "3", "1", 0);
+            mTtlFactory.PrintText("\r\n", "3", "1", 0);
             mTtlFactory.PrintText("\r\n_________________________________", "3", "1", 0);
         }
     }
 
-    public void printDeliverNote(String storeHouseName, List<Device> lstDevices) {
+    public void printDeliverNote(String storeHouseName, List<Device> lstDevices,String code) {
+
         mTtlFactory.PrintText("\r\n", "3", "1", 0);
         mTtlFactory.PrintText("\r\n________________________________", "2", "1", 0);
         mTtlFactory.PrintText("厦门路桥管理无人值守库房", "2", "3", 0);
@@ -141,16 +142,10 @@ public class TTLUtils {
                 mTtlFactory.PrintText("", "2", "1", 0);
             }
         }
-//        mTtlFactory.PrintText("高压钠灯 *10", "1", "1", 0);
-//        mTtlFactory.PrintText("", "2", "1", 0);
-//        mTtlFactory.PrintText("泡沫灭火器 *10", "1", "1", 0);
-//        mTtlFactory.PrintText("", "2", "1", 0);
-//        mTtlFactory.PrintText("移动帧报警侦测系统 *10", "1", "1", 0);
         mTtlFactory.PrintText("\r\n", "3", "1", 0);
-//        mTtlFactory.PrintText("\r\n", "3", "1", 0);
-        // mTtlFactory.PrintText("\r\n_________________________________", "3", "1", 0);
-//        mTtlFactory.PrintBarcode(lstDevices.get(0).getAssetCode(), 9, 80, 8, 0);
-//        mTtlFactory.PrintText("\r\n", "3", "1", 0);
+
+        mTtlFactory.PrintBarcode(code, 3,80,9,0);
+        mTtlFactory.PrintText("\r\n", "3", "1", 0);
         mTtlFactory.PrintText("\r\n", "3", "1", 0);
         mTtlFactory.PrintText("\r\n_________________________________", "3", "1", 0);
     }
