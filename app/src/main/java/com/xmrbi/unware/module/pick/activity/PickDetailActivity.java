@@ -419,7 +419,7 @@ public class PickDetailActivity extends BaseActivity {
                                             for (int i = 0; i < 10; i++) {
                                                 try {
                                                     List<String> rfidList = mRfidClient.startRead();
-                                                    matchRfids(rfidList);
+                                                     matchRfids(rfidList);
                                                 } catch (Exception e) {
                                                     e.printStackTrace();
                                                 }

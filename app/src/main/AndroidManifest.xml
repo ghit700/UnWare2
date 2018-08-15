@@ -48,17 +48,30 @@
         </activity>
         <activity android:name="com.xmrbi.unware.module.setting.activity.SettingActivity" />
         <activity android:name="com.xmrbi.unware.module.main.activity.RfidStoreHouseActivity" />
+        <activity android:name="com.xmrbi.unware.module.main.activity.StoreHouseActivity" />
         <activity android:name="com.xmrbi.unware.module.pick.activity.PickListActivity" />
         <activity android:name="com.xmrbi.unware.module.pick.activity.PickDetailActivity" />
+        <activity android:name="com.xmrbi.unware.module.pick.activity.PickInOutOrderListActivity" />
+        <activity android:name="com.xmrbi.unware.module.pick.activity.PickInOutOrderDeviceActivity"
+            android:windowSoftInputMode="stateAlwaysHidden"/>
         <activity android:name="com.xmrbi.unware.module.check.activity.CheckListActivity" />
         <activity android:name="com.xmrbi.unware.module.check.activity.CheckDetailActivity" />
-        <activity android:name="com.xmrbi.unware.module.search.activity.BarcodeScanActivity"
-            android:windowSoftInputMode="stateAlwaysHidden"/>
-        <activity android:name="com.xmrbi.unware.module.search.activity.BarcodeDetailActivity"/>
+        <activity
+            android:name="com.xmrbi.unware.module.search.activity.BarcodeScanActivity"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity android:name="com.xmrbi.unware.module.search.activity.BarcodeDetailActivity" />
 
-        <activity android:name="com.xmrbi.unware.module.deliver.activity.DeliverInputActivity"/>
-        <activity android:name="com.xmrbi.unware.module.deliver.activity.DeliverDeviceActivity"
-            android:windowSoftInputMode="stateAlwaysHidden"/>
+        <activity android:name="com.xmrbi.unware.module.deliver.activity.DeliverInputActivity" />
+        <activity android:name="com.xmrbi.unware.module.deliver.activity.DeliverInOutOrderListActivity" />
+        <activity
+            android:name="com.xmrbi.unware.module.deliver.activity.DeliverInOutOrderPlaceActivity"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <activity
+            android:name="com.xmrbi.unware.module.deliver.activity.DeliverDeviceActivity"
+            android:windowSoftInputMode="stateAlwaysHidden" />
+        <service android:name=".component.service.HttpService">
+
+        </service>
         <!--开机自启广播-->
         <receiver
             android:name=".module.main.braodcast.RestartBroadcastReceiver"

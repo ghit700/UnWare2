@@ -14,6 +14,9 @@ public class DialogUtils {
     public static MaterialDialog alert(Context context, String content, MaterialDialog.SingleButtonCallback callback) {
         return alert(context, null, content, null,null,callback);
     }
+    public static MaterialDialog alert(Context context, String content) {
+        return alert(context, null, content, null,null,null);
+    }
     public static MaterialDialog alert(Context context,String title ,String content, MaterialDialog.SingleButtonCallback callback) {
         return alert(context, title, content, null,null,callback);
     }

@@ -84,7 +84,7 @@ public class BarcodeDetailActivity extends BaseActivity {
             mAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
                 @Override
                 public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-                    String[] rfidCodes = mlstPickListDetails.get(position).getRfidCode().split(",");
+                    String[] rfidCodes = mlstPickListDetails.get(position).getRfid().split(",");
                     new MaterialDialog.Builder(mContext)
                             .title(R.string.pick_list_detail_rfid_list_title)
                             .items(rfidCodes)

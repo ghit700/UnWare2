@@ -35,21 +35,11 @@ public class PickOrderAdapter extends BaseQuickAdapter<PickOrder, BaseViewHolder
             RecyclerView listPickItemDevice = helper.getView(R.id.listPickItemDevice);
             listPickItemDevice.setLayoutManager(new LinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false));
             String[] devices = item.getComponentCounts().split(",");
-            listPickItemDevice.setAdapter(new DeviceAdapter(Arrays.asList(devices)));
+            listPickItemDevice.setAdapter(new StringAdapter(Arrays.asList(devices)));
         }
     }
 
-    class DeviceAdapter extends BaseQuickAdapter<String, BaseViewHolder> {
 
-        public DeviceAdapter(@Nullable List<String> data) {
-            super(R.layout.pick_item_component_count, data);
-        }
-
-        @Override
-        protected void convert(BaseViewHolder helper, String item) {
-            helper.setText(R.id.tvPickItemComponentCount, item);
-        }
-    }
 
 
 }

@@ -4,13 +4,13 @@ apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 27
-    buildToolsVersion "27.0.3"
+    buildToolsVersion '28.0.0'
     defaultConfig {
         applicationId "com.xmrbi.unware"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         //分包
         multiDexEnabled true
@@ -78,5 +78,6 @@ dependencies {
     //zxing
     implementation 'com.journeyapps:zxing-android-embedded:3.2.0@aar'
     implementation 'com.google.zxing:core:3.2.1'
-    implementation files('libs/TTL_Libs.jar')
+    implementation files('libs/USB_PrintPortLibs.jar')
+    implementation files('libs/TTL_Libs_fat22.jar')
 }

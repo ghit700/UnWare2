@@ -1,8 +1,12 @@
 package com.xmrbi.unware.module.main.activity;
 
 import android.Manifest;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -20,6 +24,7 @@ import com.xmrbi.unware.base.Config;
 import com.xmrbi.unware.component.http.ExceptionHandle;
 import com.xmrbi.unware.component.http.HttpUtils;
 import com.xmrbi.unware.component.http.ResponseObserver;
+import com.xmrbi.unware.component.service.HttpService;
 import com.xmrbi.unware.data.entity.main.StoreHouse;
 import com.xmrbi.unware.data.entity.main.User;
 import com.xmrbi.unware.data.local.MainLocalSource;
@@ -65,6 +70,12 @@ public class MainActivity extends BaseActivity {
      */
     private Disposable mDisposable;
     private UpdateUtils mUpdateUtils;
+    private boolean mIsRfid;
+    private Intent mSericeIntent;
+    /**
+     * http服务连接,传递mainactivity实体
+     */
+    private ServiceConnection mConnection;
 
     @Override
     protected int getLayout() {
@@ -80,7 +91,11 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
                 User user = mLstUsers.get(position);
-                RfidStoreHouseActivity.lauch(mContext, user);
+                if (mIsRfid) {
+                    RfidStoreHouseActivity.lauch(mContext, user);
+                } else {
+                    StoreHouseActivity.lauch(mContext, user);
+                }
             }
         });
         listMainLstUsers.setAdapter(mAdapter);
@@ -90,6 +105,7 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void initEventAndData() {
+        mIsRfid = SPUtils.getInstance(Config.SP.SP_NAME).getBoolean(Config.SP.SP_IS_RFID, true);
         //应用全屏显示
         closeAllScreen(true);
         //判断是否进入设置页面
@@ -103,7 +119,22 @@ public class MainActivity extends BaseActivity {
         //初始化
         mMainLocalSource = new MainLocalSource();
         mMainRepository = new MainRepository(this);
-        mUpdateUtils=new UpdateUtils(mContext);
+        mUpdateUtils = new UpdateUtils(mContext);
+        //后台服务
+        mConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                HttpService.HttpBinder bind = (HttpService.HttpBinder) service;
+                bind.startupService(MainActivity.this);
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        };
+        mSericeIntent = new Intent(mContext, HttpService.class);
+        bindService(mSericeIntent, mConnection,BIND_AUTO_CREATE);
         //定时查询在库人员
         queryStoreHouseUser();
         //接收设置修改事件
@@ -123,7 +154,16 @@ public class MainActivity extends BaseActivity {
     protected void onDestroy() {
         super.onDestroy();
         closeAllScreen(false);
+        stopService(mSericeIntent);
     }
+
+        @Override
+    protected void onResume() {
+        super.onResume();
+        mIsRfid = SPUtils.getInstance(Config.SP.SP_NAME).getBoolean(Config.SP.SP_IS_RFID, true);
+
+    }
+
 
     /**
      * 启动设置页面
@@ -149,7 +189,7 @@ public class MainActivity extends BaseActivity {
                     @Override
                     public void accept(Long time) throws Exception {
                         if (mStoreHouse != null) {
-                            mMainRepository.queryStoreHouseUser(mStoreHouse.getId())
+                            mMainRepository.queryStoreHouseUserByGmms(mStoreHouse.getId())
                                     .subscribe(new ResponseObserver<List<User>>(MainActivity.this, false, false) {
                                         @Override
                                         public void handleData(List<User> data) {
@@ -157,12 +197,17 @@ public class MainActivity extends BaseActivity {
                                             mLstUsers.clear();
                                             mLstUsers.addAll(data);
                                             mAdapter.notifyDataSetChanged();
-                                            if(ActivityStackUtils.getAllActivities().size()==1){
-                                                User user=data.get(0);
-                                                if(user.isKeeper()){
-                                                    RfidStoreHouseActivity.lauch(mContext, user);
-                                                }else{
-                                                    PickListActivity.lauch(mContext,user);
+                                            if (ActivityStackUtils.getAllActivities().size() == 1 && mLstUsers.size() > 0) {
+                                                User user = data.get(0);
+                                                if (mIsRfid) {
+                                                    if (user.isKeeper()) {
+                                                        RfidStoreHouseActivity.lauch(mContext, user);
+                                                    } else {
+                                                        PickListActivity.lauch(mContext, user);
+                                                    }
+                                                } else {
+                                                    StoreHouseActivity.lauch(mContext, user);
+
                                                 }
                                             }
                                         }

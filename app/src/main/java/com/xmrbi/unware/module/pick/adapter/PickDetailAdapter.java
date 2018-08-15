@@ -42,7 +42,14 @@ public class PickDetailAdapter extends BaseQuickAdapter<PickListDetail, BaseView
         helper.setVisible(R.id.tvPickItemRfidText, false);
 
         helper.setVisible(R.id.tvPickItemRfidScanAmount, false);
+
         if (!StringUtils.isEmpty(item.getRfidCode())) {
+            if(!StringUtils.isEmpty(item.getRfid())&&item.getRfid().indexOf(",")==0){
+                item.setRfid(item.getRfid().substring(1));
+                if(item.getRfid().lastIndexOf(",")==item.getRfid().length()-1){
+                    item.setRfid(item.getRfid().substring(0,item.getRfid().length()-1));
+                }
+            }
             helper.setVisible(R.id.tvPickItemRfidText, true);
 
             String[] rfids = item.getRfidCode().split(",");
@@ -53,7 +60,11 @@ public class PickDetailAdapter extends BaseQuickAdapter<PickListDetail, BaseView
                     rfidScanAmount = item.getRfid().split(",").length;
                 }
                 helper.setText(R.id.tvPickItemRfidText, "识别情况：");
-                helper.setText(R.id.tvPickItemRfidScanAmount, rfidScanAmount + "/" + rfids.length);
+                if(isShowFinish){
+                    helper.setText(R.id.tvPickItemRfidScanAmount, rfidScanAmount + "/" + rfids.length);
+                }else{
+                    helper.setText(R.id.tvPickItemRfidScanAmount, rfidScanAmount + "/" + rfidScanAmount);
+                }
                 helper.setVisible(R.id.btnPickItemCheckRfid, true);
                 helper.addOnClickListener(R.id.btnPickItemCheckRfid);
             } else {
@@ -61,6 +72,7 @@ public class PickDetailAdapter extends BaseQuickAdapter<PickListDetail, BaseView
                 helper.setVisible(R.id.tvPickItemRfid, true);
                 helper.setText(R.id.tvPickItemRfid, item.getRfidCode());
             }
+
             if (!StringUtils.isEmpty(item.getRfid()) && item.getRfidCode().length() == item.getRfid().length() && isShowFinish) {
                 helper.setVisible(R.id.ivPickItemCheckRight, true);
                 item.setRelation(true);

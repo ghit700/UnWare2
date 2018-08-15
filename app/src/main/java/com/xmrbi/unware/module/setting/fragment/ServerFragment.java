@@ -1,11 +1,15 @@
 package com.xmrbi.unware.module.setting.fragment;
 
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -37,8 +41,9 @@ import java.util.List;
 import java.util.Map;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.reactivex.functions.Consumer;
+import butterknife.Unbinder;
 
 /**
  * Created by wzn on 2018/5/4.
@@ -76,6 +81,17 @@ public class ServerFragment extends BaseFragment {
     EditText etSettingCodePrintSerialAddress;
     @BindView(R.id.tvSettingExit)
     TextView tvSettingExit;
+    @BindView(R.id.etSettingCodeLightBaudRate)
+    EditText etSettingCodeLightBaudRate;
+    @BindView(R.id.etSettingCodeLightSerialAddress)
+    EditText etSettingCodeLightSerialAddress;
+    @BindView(R.id.rbSettingRfidTrue)
+    RadioButton rbSettingRfidTrue;
+    @BindView(R.id.rbSettingRfidFalse)
+    RadioButton rbSettingRfidFalse;
+    Unbinder unbinder;
+    @BindView(R.id.rgSettingRfid)
+    RadioGroup rgSettingRfid;
 
     private MainRepository mMainRepository;
     private MainLocalSource mMainLocalSource;
@@ -85,6 +101,10 @@ public class ServerFragment extends BaseFragment {
     private List<StoreHouse> mLstStoreHouses;
     private Useunit mUseunit;
     private StoreHouse mStoreHouse;
+    /**
+     * 是否是rfid仓库
+     */
+    private Boolean mIsRfid;
 
 
     public static ServerFragment newInstance() {
@@ -101,6 +121,16 @@ public class ServerFragment extends BaseFragment {
     protected void onViewCreated() {
         etSettingGmmsIp.setText(Config.Http.SERVER_GMMS);
         etSettingWareHouseIp.setText(Config.Http.SERVER_IP);
+        rgSettingRfid.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if(checkedId==R.id.rbSettingRfidTrue){
+                    mIsRfid=true;
+                }else{
+                    mIsRfid=false;
+                }
+            }
+        });
     }
 
     @Override
@@ -108,6 +138,12 @@ public class ServerFragment extends BaseFragment {
         mLstUseunits = new ArrayList<>();
         mLstStoreHouses = new ArrayList<>();
         mMainLocalSource = new MainLocalSource();
+        mIsRfid=SPUtils.getInstance(Config.SP.SP_NAME).getBoolean(Config.SP.SP_IS_RFID,true);
+        if(mIsRfid){
+            rbSettingRfidTrue.setChecked(true);
+        }else{
+            rbSettingRfidFalse.setChecked(true);
+        }
         if (!SPUtils.getInstance(Config.SP.SP_NAME).getBoolean(Config.SP.SP_IS_SETTING)) {
             mobileLesseeIdStoreHouse();
         } else {
@@ -160,6 +196,8 @@ public class ServerFragment extends BaseFragment {
         params.put("printBautRate", etSettingNotePrintBaudRate.getText().toString().trim());
         params.put("codeSerialName", etSettingCodePrintSerialAddress.getText().toString().trim());
         params.put("codeBautRate", etSettingCodePrintBaudRate.getText().toString());
+        params.put("lightSerialName", etSettingCodeLightSerialAddress.getText().toString().trim());
+        params.put("lightBautRate", etSettingCodeLightBaudRate.getText().toString());
 
         mMainRepository.mobileSaveAioConfig(params)
                 .subscribe(new BaseObserver<String>(getBaseActivity(), true) {
@@ -169,6 +207,7 @@ public class ServerFragment extends BaseFragment {
                             SPUtils.getInstance(Config.SP.SP_NAME).put(Config.SP.SP_SERVER_IP, etSettingWareHouseIp.getText().toString().trim());
                             SPUtils.getInstance(Config.SP.SP_NAME).put(Config.SP.SP_SERVER_GMMS_IP, etSettingGmmsIp.getText().toString().trim());
                             SPUtils.getInstance(Config.SP.SP_NAME).put(Config.SP.SP_CHANNEL, etSettingChannel.getText().toString().trim());
+                            SPUtils.getInstance(Config.SP.SP_NAME).put(Config.SP.SP_IS_RFID, mIsRfid);
                             HttpUtils.resetServerAddress();
                             mMainLocalSource.saveStoreHouse(mStoreHouse);
                             mMainLocalSource.saveUseunit(mUseunit);
@@ -281,18 +320,34 @@ public class ServerFragment extends BaseFragment {
                             etSettingNotePrintBaudRate.setText(config.getPrintBautRate());
                             etSettingCodePrintBaudRate.setText(config.getCodeBautRate());
                             etSettingCodePrintSerialAddress.setText(config.getCodeSerialName());
+                            etSettingCodeLightBaudRate.setText(config.getLightBautRate());
+                            etSettingCodeLightSerialAddress.setText(config.getLightSerialName());
                         }
                     }
                 });
 
     }
 
-    private int mCount=0;
+    private int mCount = 0;
+
     @OnClick(R.id.tvSettingExit)
-    public void exitWareHouse(){
-        if(mCount++>10){
+    public void exitWareHouse() {
+        if (mCount++ > 10) {
             ActivityStackUtils.finishAllActivity();
         }
     }
 
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // TODO: inflate a fragment view
+        View rootView = super.onCreateView(inflater, container, savedInstanceState);
+        unbinder = ButterKnife.bind(this, rootView);
+        return rootView;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
 }

@@ -176,6 +176,12 @@ public class PickListActivity extends BaseActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        downloadPickOrder();
+    }
+
+    @Override
     protected void onDestroy() {
         try {
             if (mRfidClient != null) {
@@ -257,7 +263,14 @@ public class PickListActivity extends BaseActivity {
                 .subscribe(new ResponseObserver<List<PickOrder>>(this) {
                     @Override
                     public void handleData(List<PickOrder> data) {
+                        mlstPickOrders.clear();
                         mlstPickOrders.addAll(data);
+                        mAdapter.notifyDataSetChanged();
+                    }
+                    @Override
+                    protected void handleErrorData() {
+                        super.handleErrorData();
+                        mlstPickOrders.clear();
                         mAdapter.notifyDataSetChanged();
                     }
                 });

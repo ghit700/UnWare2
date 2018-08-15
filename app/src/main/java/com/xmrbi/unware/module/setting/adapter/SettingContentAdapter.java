@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import com.xmrbi.unware.base.BaseFragment;
 import com.xmrbi.unware.component.view.FragmentPagerAdapter.FragmentPagerAdapter;
 import com.xmrbi.unware.module.setting.fragment.ServerFragment;
+import com.xmrbi.unware.module.setting.fragment.ServerFragment2;
 import com.xmrbi.unware.module.setting.fragment.TestDeviceFragment;
 
 import java.util.ArrayList;
@@ -23,7 +24,7 @@ public class SettingContentAdapter extends FragmentPagerAdapter {
     public SettingContentAdapter(FragmentManager fm) {
         super(fm);
         List<BaseFragment> lstFragments = new ArrayList<>();
-        lstFragments.add(ServerFragment.newInstance());
+        lstFragments.add(ServerFragment2.newInstance());
         lstFragments.add(TestDeviceFragment.newInstance());
         this.mlstFragments = lstFragments;
         this.mlstTabs = new String[]{"仓库设置", "设备自检"};

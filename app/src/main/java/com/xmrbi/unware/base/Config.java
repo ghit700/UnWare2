@@ -53,6 +53,10 @@ public class Config {
          * 海康摄像头通道号
          */
         public final static String SP_CHANNEL = "channel";
+        /**
+         * 是否是rfid仓库
+         */
+        public final static String SP_IS_RFID = "is_rfid";
     }
 
     public static class Crash {
@@ -70,17 +74,17 @@ public class Config {
         /**
          * 超时时间
          */
-        public static final int DEFAULT_TIMEOUT = 30;
+        public static final int DEFAULT_TIMEOUT = 100;
         /**
          * 服务器地址
          */
-//        public static String SERVER_IP = "http://192.168.4.21:8787/";
-        public static String SERVER_IP = "http://172.20.60.40:8787/";
+        public static String SERVER_IP = "http://172.16.53.225:8080/";
+//        public static String SERVER_IP = "http://172.20.60.40:8787/";
         /**
          * gmms地址
          */
-        public static  String SERVER_GMMS="http://172.20.60.40:8280/";
-//        public static String SERVER_GMMS = "http://172.16.53.226:8080/";
+//        public static  String SERVER_GMMS="http://172.20.60.40:8280/";
+                public static String SERVER_GMMS = "http://192.168.1.110:8844/";
         //        public static final String SERVER_GMMS="http://172.16.53.226:8080/";
         public static final boolean IS_IP_ADDRESS = true;
 
@@ -100,6 +104,11 @@ public class Config {
          * apk本地下载地址
          */
         public static final String UPDATE_APK_FILE_ADDRESS = UPDATE_APK_FILE_ADDRESS_DIR + File.separator + "UnWare.apk";
+
+        /**
+         * 本地服务的端口号
+         */
+        public static final int HTTP_SERVICE_PORT = 8081;
     }
 
 

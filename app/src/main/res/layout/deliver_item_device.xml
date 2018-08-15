@@ -19,11 +19,11 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:textColor="@color/text_check_list"
         android:id="@+id/tvDeliverItemName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:textColor="@color/text_check_list"
         app:layout_constraintStart_toEndOf="@+id/textView36"
         app:layout_constraintTop_toTopOf="@+id/textView36"
         tools:text="BV线" />
@@ -50,22 +50,22 @@
         tools:text="南平太阳" />
 
     <TextView
-        android:textColor="@color/white"
         android:id="@+id/textView40"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="型号："
+        android:textColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView38" />
 
     <TextView
         android:id="@+id/tvDeliverItemModelName"
-        android:textColor="@color/text_check_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:textColor="@color/text_check_list"
         app:layout_constraintStart_toEndOf="@+id/textView40"
         app:layout_constraintTop_toTopOf="@+id/textView40"
         tools:text="2.5mm" />
@@ -83,16 +83,15 @@
 
     <TextView
         android:id="@+id/tvDeliverItemAmount"
-        android:textColor="@color/text_check_list"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="1"
+        android:textColor="@color/text_check_list"
         app:layout_constraintStart_toEndOf="@+id/textView42"
         app:layout_constraintTop_toTopOf="@+id/textView42" />
 
     <TextView
-        android:textColor="@color/white"
         android:id="@+id/textView44"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -100,17 +99,18 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="资产编号："
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView42" />
 
     <TextView
-        android:textColor="@color/text_check_list"
         android:id="@+id/tvDeliverItemAssetCode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:text="DG-CG19776"
+        android:textColor="@color/text_check_list"
         app:layout_constraintStart_toEndOf="@+id/textView44"
         app:layout_constraintTop_toTopOf="@+id/textView44" />
 
@@ -122,38 +122,38 @@
         app:layout_constraintGuide_percent="0.5" />
 
     <TextView
-        android:textColor="@color/white"
         android:id="@+id/tvDeliverItemDrawerText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="32dp"
         android:text="货架位置"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toTopOf="@+id/guideline9"
         app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
-        android:textColor="@color/text_check_list"
         android:id="@+id/tvDeliverItemDrawer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="32dp"
         android:layout_marginTop="8dp"
+        android:textColor="@color/text_check_list"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline9"
         tools:text="弱电1#" />
 
     <Button
-        android:padding="@dimen/dip_10"
         android:id="@+id/btnDeliverItemChooseDrawer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="32dp"
         android:layout_marginTop="8dp"
+        android:background="@drawable/btn_bg_common"
+        android:padding="@dimen/dip_10"
         android:text="选择货架"
         android:textColor="@color/white"
-        android:background="@drawable/btn_bg_common"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

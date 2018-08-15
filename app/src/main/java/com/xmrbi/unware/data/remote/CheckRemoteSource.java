@@ -16,11 +16,13 @@ import retrofit2.http.Query;
 public interface CheckRemoteSource {
     /**
      * 获取最新5条盘点单
+     *
      * @param storeHouseId
      * @return
      */
     @GET("storehouse/checkstore/checkstore/mobileCheckStoreDevicesForFive")
     Observable<Response<List<CheckList>>> mobileCheckStoreDevicesForFive(@Query("storeHouseId") long storeHouseId);
+
     /**
      * 获取盘点单数据
      *
@@ -29,8 +31,6 @@ public interface CheckRemoteSource {
      */
     @GET("storehouse/checkstore/checkstore/mobileCountCheckStoreDeviceItem")
     Observable<Response<List<RfidNewInventoryEntity>>> mobileCountCheckStoreDeviceItem(@Query("checkId") long checkId);
-
-
 
 
 }

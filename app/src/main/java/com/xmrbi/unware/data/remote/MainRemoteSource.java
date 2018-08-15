@@ -63,6 +63,15 @@ public interface MainRemoteSource {
     Observable<Response<List<User>>> queryStoreHouseUser(@Query("storeHouseId") long storeHouseId);
 
     /**
+     * 查询当前在库人员
+     *
+     * @param storeHouseId
+     * @return
+     */
+    @GET("gmms/modules/mobile/device/store-house!queryStoreHouseUser.action")
+    Observable<Response<List<User>>> queryStoreHouseUserByGmms(@Query("storeHouseId") long storeHouseId);
+
+    /**
      * 获取rfid码对应的设备
      *
      * @param rfid
@@ -83,20 +92,78 @@ public interface MainRemoteSource {
     Observable<String> remoteCtrlLight(@Query("storeHouseId") long storeHouseId, @Query("allDrawerIds") String allDrawerIds, @Query("operDrawerIds") String operDrawerIds, @Query("ctrlType") String ctrlType, @Query("onOrOff") boolean onOrOff);
 
     /**
+     * 获取仓库所有的灯光控制器
+     *
+     * @param storeHouseId
+     * @return
+     */
+    @GET("gmms/modules/mobile/device/store-house!queryDrawersLightControl.action")
+    Observable<Response<List<StoreHouseDevice>>> queryDrawersLightControl(@Query("storeHouseId") long storeHouseId);
+
+    /**
      * 上传图片
      */
     @Multipart
     @POST("gmms/modules/disease/disease!imgUploadAnnex.action")
-    Observable<String> imgUploadAnnex(@Part MultipartBody.Part imgFile,@Query("userId")long userId);
+    Observable<String> imgUploadAnnex(@Part MultipartBody.Part imgFile, @Query("userId") long userId);
 
     /**
      * 获取仓库设备配置
+     *
      * @param storeHouseId
      * @param deviceType
      * @param drawerIds
      * @return
      */
     @GET("storehouse/device/mobileQueryStoreHouseDevice")
-    Observable<Response<List<StoreHouseDevice>>> queryStoreHouseDevice(@Query("storeHouseId")long storeHouseId,@Query("deviceType")long deviceType,@Query("drawerIds")String drawerIds);
+    Observable<Response<List<StoreHouseDevice>>> queryStoreHouseDevice(@Query("storeHouseId") long storeHouseId, @Query("deviceType") long deviceType, @Query("drawerIds") String drawerIds);
+
+    /**
+     * 获取仓库门禁设备的配置
+     *
+     * @param storeHouseId
+     * @return
+     */
+    @GET("gmms/modules/mobile/device/store-house!queryDoorConfig.action")
+    Observable<Response<StoreHouseDevice>> queryDoorConfig(@Query("storeHouseId") long storeHouseId);
+
+
+    /**
+     * 获取仓库配置
+     *
+     * @param storeHouseId
+     * @return
+     */
+    @GET("gmms/modules/mobile/device/store-house!queryStoreHouseConfig.action")
+    Observable<Response<List<StoreHouseAioConfig>>> queryStoreHouseConfig(@Query("storeHouseId") long storeHouseId);
+
+    /**
+     * 获取租户
+     *
+     * @return
+     */
+    @GET("gmms/modules/mobile/device/store-house!queryUseunitList.action")
+    Observable<Response<List<Useunit>>> queryUseunitList();
+
+    /**
+     * 保存仓库配置
+     *
+     * @param params
+     * @return
+     */
+    @FormUrlEncoded
+    @POST("gmms/modules/mobile/device/store-house!saveStoreHouseConfig.action")
+    Observable<String> saveStoreHouseConfig(@FieldMap Map<String, String> params);
+
+    /**
+     * 指纹打卡进入仓库触发上位机向gmms发送仓库状态
+     *
+     * @param storeHouseId
+     * @param userId
+     * @param oper         入库还是出库
+     * @return
+     */
+    @GET("gmms/modules/mobile/device/store-house!triggerSend.action")
+    Observable<Response<String>> triggerSend(@Query("storeHouseId") long storeHouseId, @Query("userId") long userId, @Query("oper") String oper);
 }
 

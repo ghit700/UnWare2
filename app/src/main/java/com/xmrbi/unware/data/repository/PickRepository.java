@@ -5,6 +5,7 @@ import com.xmrbi.unware.base.Config;
 import com.xmrbi.unware.component.http.IOTransformer;
 import com.xmrbi.unware.component.http.Response;
 import com.xmrbi.unware.component.http.RetrofitHelper;
+import com.xmrbi.unware.data.entity.deliver.Device;
 import com.xmrbi.unware.data.entity.main.Useunit;
 import com.xmrbi.unware.data.entity.pick.PickListDetail;
 import com.xmrbi.unware.data.entity.pick.PickOrder;
@@ -46,5 +47,15 @@ public class PickRepository extends BaseRepository {
     public Observable<String> updatePickListRfid(String rfid, long deviceId, long pickListId) {
         return mGmmsPickRemoteSource.updatePickListRfid(rfid, deviceId, pickListId)
                 .compose(new IOTransformer<String>(mBaseActivity));
+    }
+
+    public Observable<Response<String>> endPick(long inOutOrderId, long userId, String inOutOrderListIds) {
+        return mGmmsPickRemoteSource.endPick(inOutOrderId, userId, inOutOrderListIds)
+                .compose(new IOTransformer<Response<String>>(mBaseActivity));
+    }
+
+    public Observable<Response<Device>> queryDeviceBySequenceCode(String sequenceCode, long lesseeId) {
+        return mGmmsPickRemoteSource.queryDeviceBySequenceCode(sequenceCode, lesseeId)
+                .compose(new IOTransformer<Response<Device>>(mBaseActivity));
     }
 }
