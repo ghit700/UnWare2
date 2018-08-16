@@ -86,7 +86,6 @@ public class PickInOutOrderDeviceActivity extends BaseActivity {
     private MainLocalSource mMainLocalSource;
     private PickRepository mPickRepository;
     private StoreHouse mStoreHouse;
-    private RTUUtils mRtuUtils;
 
 
     @Override
@@ -143,7 +142,6 @@ public class PickInOutOrderDeviceActivity extends BaseActivity {
         mMainLocalSource = new MainLocalSource();
         mStoreHouse = mMainLocalSource.getStoreHouse();
         mPickRepository = new PickRepository(this);
-        mRtuUtils = new RTUUtils();
         queryInOutOrderDetail();
     }
 
@@ -184,7 +182,7 @@ public class PickInOutOrderDeviceActivity extends BaseActivity {
                 }
             }
         }
-        mMainRepository.controlLightByRTU(mRtuUtils, mStoreHouse.getId(), drawerIds, onOrOff)
+        mMainRepository.controlLightByEio(mStoreHouse.getId(), drawerIds, onOrOff)
                 .subscribe(new Consumer<String>() {
                     @Override
                     public void accept(String s) throws Exception {
@@ -197,19 +195,7 @@ public class PickInOutOrderDeviceActivity extends BaseActivity {
      * 获取入库单明细
      */
     private void queryInOutOrderDetail() {
-        //获取灯光配置器
-        mMainRepository.queryStoreHouseConfig(mStoreHouse.getId())
-                .flatMap(new Function<Response<List<StoreHouseAioConfig>>, ObservableSource<Response<List<InOutOrderList>>>>() {
-                    @Override
-                    public ObservableSource<Response<List<InOutOrderList>>> apply(Response<List<StoreHouseAioConfig>> data) throws Exception {
-                        if (data.isSuccess() && data.getData() != null && !data.getData().isEmpty()) {
-                            StoreHouseAioConfig config = data.getData().get(0);
-                            mRtuUtils.init(config.getLightSerialName(), config.getLightBautRate());
-                        }
-                        //获取入单库明细
-                        return mDeliverRepository.queryInOutOrderDetail(mInOutOrderId);
-                    }
-                })
+        mDeliverRepository.queryInOutOrderDetail(mInOutOrderId)
                 .subscribe(new ResponseObserver<List<InOutOrderList>>(this) {
                     @Override
                     public void handleData(List<InOutOrderList> data) {

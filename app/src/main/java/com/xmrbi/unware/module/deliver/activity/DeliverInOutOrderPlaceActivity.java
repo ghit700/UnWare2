@@ -9,6 +9,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -58,9 +59,10 @@ public class DeliverInOutOrderPlaceActivity extends BaseActivity {
     }
 
 
-
     @BindView(R.id.btnDeliverEndPlace)
     Button btnDeliverEndPlace;
+    @BindView(R.id.ivDeliverBack)
+    ImageView ivDeliverBack;
     @BindView(R.id.tvDeliverCode)
     TextView tvDeliverCode;
     @BindView(R.id.tvDeliverPlaceSituation)
@@ -81,7 +83,6 @@ public class DeliverInOutOrderPlaceActivity extends BaseActivity {
     private MainLocalSource mMainLocalSource;
     private StoreHouse mStoreHouse;
     private long mInOutOrderId;
-    private RTUUtils mRtuUtils;
 
     @Override
     protected int getLayout() {
@@ -104,12 +105,12 @@ public class DeliverInOutOrderPlaceActivity extends BaseActivity {
                             iool.setScan(true);
                             mAdapter.notifyDataSetChanged();
                             setPlaceSituation();
-                            showDrawerSelect(iool.getDrawerIds(),true);
+                            showDrawerSelect(iool.getDrawerIds(), true);
                             etDeliverScan.setText("");
                             return false;
                         }
                     }
-                    if(!StringUtils.isEmpty(text)){
+                    if (!StringUtils.isEmpty(text)) {
                         showErrorResult(text);
                         etDeliverScan.setText("");
                     }
@@ -128,22 +129,22 @@ public class DeliverInOutOrderPlaceActivity extends BaseActivity {
         mUser = (User) mBundle.getSerializable("user");
         mDeliverRepository = new DeliverRepository(this);
         mMainRepository = new MainRepository(this);
-        mPickRepository=new PickRepository(this);
+        mPickRepository = new PickRepository(this);
         mMainLocalSource = new MainLocalSource();
         mStoreHouse = mMainLocalSource.getStoreHouse();
         mInOutOrderId = mBundle.getLong("inOutOrderId");
-        mRtuUtils = new RTUUtils();
         queryInOutOrderDetail();
     }
 
     @Override
     protected void onDestroy() {
-        showDrawerSelect(null,false);
+        showDrawerSelect(null, false);
         super.onDestroy();
     }
 
     /**
      * 显示扫描到的错误的货物
+     *
      * @param code
      */
     private void showErrorResult(final String code) {
@@ -151,7 +152,7 @@ public class DeliverInOutOrderPlaceActivity extends BaseActivity {
                 .subscribe(new ResponseObserver<Device>(this) {
                     @Override
                     public void handleData(Device data) {
-                        String name=data.getComponentName()==null?"":data.getComponentName();
+                        String name = data.getComponentName() == null ? "" : data.getComponentName();
                         DialogUtils.alert(mContext, "扫描错误：" + code + "-" + name).show();
                     }
                 });
@@ -160,39 +161,25 @@ public class DeliverInOutOrderPlaceActivity extends BaseActivity {
     /**
      * 灭掉仓库所有的灯，亮起货架的灯
      */
-    private void showDrawerSelect(String drawerIds,boolean onOrOff) {
-        if (mRtuUtils.getmMySp() != null) {
-            List<String> lstDrawers=null;
-            if(!StringUtils.isEmpty(drawerIds)){
-                lstDrawers= Arrays.asList(drawerIds.split(","));
-            }
-            mMainRepository.controlLightByRTU(mRtuUtils, mStoreHouse.getId(),lstDrawers , onOrOff)
-            .subscribe(new Consumer<String>() {
-                @Override
-                public void accept(String s) throws Exception {
-                    LogUtils.d("light result:"+s);
-                }
-            });
+    private void showDrawerSelect(String drawerIds, boolean onOrOff) {
+        List<String> lstDrawers = null;
+        if (!StringUtils.isEmpty(drawerIds)) {
+            lstDrawers = Arrays.asList(drawerIds.split(","));
         }
+        mMainRepository.controlLightByEio(mStoreHouse.getId(), lstDrawers, onOrOff)
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        LogUtils.d("light result:" + s);
+                    }
+                });
     }
 
     /**
      * 获取入库单明细
      */
     private void queryInOutOrderDetail() {
-        //获取灯光配置器
-        mMainRepository.queryStoreHouseConfig(mStoreHouse.getId())
-                .flatMap(new Function<Response<List<StoreHouseAioConfig>>, ObservableSource<Response<List<InOutOrderList>>>>() {
-                    @Override
-                    public ObservableSource<Response<List<InOutOrderList>>> apply(Response<List<StoreHouseAioConfig>> data) throws Exception {
-                        if (data.isSuccess() && data.getData() != null && !data.getData().isEmpty()) {
-                            StoreHouseAioConfig config = data.getData().get(0);
-                            mRtuUtils.init(config.getLightSerialName(), config.getLightBautRate());
-                        }
-                        //获取入单库明细
-                        return mDeliverRepository.queryInOutOrderDetail(mInOutOrderId);
-                    }
-                })
+        mDeliverRepository.queryInOutOrderDetail(mInOutOrderId)
                 .subscribe(new ResponseObserver<List<InOutOrderList>>(this) {
                     @Override
                     public void handleData(List<InOutOrderList> data) {
@@ -212,6 +199,11 @@ public class DeliverInOutOrderPlaceActivity extends BaseActivity {
             }
         }
         tvDeliverPlaceSituation.setText(placeCount + "/" + mLstIools.size());
+    }
+
+    @OnClick(R.id.ivDeliverBack)
+    public void deliverBack() {
+        onBackPressed();
     }
 
 

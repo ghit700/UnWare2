@@ -1,14 +1,11 @@
 package com.xmrbi.unware.data.repository;
 
 
-import android.content.Intent;
-
-import com.google.zxing.common.StringUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.xmrbi.unware.base.BaseActivity;
 import com.xmrbi.unware.base.Config;
 import com.xmrbi.unware.component.http.IOTransformer;
 import com.xmrbi.unware.component.http.Response;
-import com.xmrbi.unware.component.http.ResponseObserver;
 import com.xmrbi.unware.component.http.RetrofitHelper;
 import com.xmrbi.unware.data.entity.main.Rfid;
 import com.xmrbi.unware.data.entity.main.StoreHouseAioConfig;
@@ -27,7 +24,6 @@ import java.util.Map;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
-import io.reactivex.Scheduler;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -197,6 +193,91 @@ public class MainRepository extends BaseRepository {
                 .compose(new IOTransformer<String>(mBaseActivity));
     }
 
+    public Observable<String> controlLightByEio(long storeHouseId, final List<String> drawerIds, final boolean onOrOff) {
+        return mGmmsMainRemoteSource.queryDrawersLightControl(storeHouseId)
+                .flatMap(new Function<Response<List<StoreHouseDevice>>, ObservableSource<String>>() {
+                    @Override
+                    public ObservableSource<String> apply(Response<List<StoreHouseDevice>> response) throws Exception {
+                        if (response.isSuccess()) {
+                            List<StoreHouseDevice> lstStoreHouseDevices = response.getData();
+                            if (onOrOff) {
+                                //亮灯，先全暗，再亮
+                                Map<String, List<Integer>> lights = new HashMap<>();
+                                Map<String, List<Integer>> dark = new HashMap<>();
+                                for (StoreHouseDevice shd : lstStoreHouseDevices) {
+                                    if (!StringUtils.isEmpty(shd.getIpIn()) && shd.getPortIn() != null && !StringUtils.isEmpty(shd.getCtrlNumber())) {
+                                        String[] controlDrawers = shd.getDrawerIds().split(",");
+                                        boolean isDark=true;
+                                        //获取需要亮灯货架的地址位和机位
+                                        for (String drawerId : controlDrawers) {
+                                            if (drawerIds != null && drawerIds.contains(drawerId)) {
+                                                isDark=false;
+                                                //需要亮的灯
+                                                List<Integer> list = lights.get(shd.getIpIn() + ":" + shd.getPortIn());
+                                                if (list == null) {
+                                                    list = new ArrayList<>();
+                                                    lights.put(shd.getIpIn() + ":" + shd.getPortIn(), list);
+                                                }
+                                                if (!list.contains(Integer.parseInt(shd.getCtrlNumber()))) {
+                                                    list.add(Integer.parseInt(shd.getCtrlNumber()));
+                                                }
+                                                break;
+                                            }
+                                        }
+                                        if(isDark){
+                                            //需要灭掉的灯
+                                            List<Integer> list = dark.get(shd.getIpIn() + ":" + shd.getPortIn());
+                                            if (list == null) {
+                                                list = new ArrayList<>();
+                                                dark.put(shd.getIpIn() + ":" + shd.getPortIn(), list);
+                                            }
+                                            if (!list.contains(Integer.parseInt(shd.getCtrlNumber()))) {
+                                                list.add(Integer.parseInt(shd.getCtrlNumber()));
+                                            }
+                                        }
+                                    }
+
+                                }
+                                //亮灯
+                                for (String address : lights.keySet()) {
+                                    List<Integer> lstCtrlNumbers = lights.get(address);
+                                    List<Integer> lstDarks = dark.get(address);
+                                    if (lstDarks == null) {
+                                        lstDarks = new ArrayList<>();
+                                    }
+                                    String[] ipAndPort = address.split(":");
+                                    EioUtils.ctrlMultipleLight(ipAndPort[0], Integer.parseInt(ipAndPort[1]), lstCtrlNumbers, lstDarks);
+                                }
+                            } else {
+                                //灭灯操作都是全灭
+                                Map<String, List<Integer>> map = new HashMap<>();
+                                for (StoreHouseDevice shd : lstStoreHouseDevices) {
+                                    if (!StringUtils.isEmpty(shd.getIpIn()) && shd.getPortIn() != null && !StringUtils.isEmpty(shd.getCtrlNumber())) {
+                                        List<Integer> list = map.get(shd.getIpIn() + ":" + shd.getPortIn());
+                                        if (list == null) {
+                                            list = new ArrayList<>();
+                                            map.put(shd.getIpIn() + ":" + shd.getPortIn(), list);
+                                        }
+                                        if (!list.contains(Integer.parseInt(shd.getCtrlNumber()))) {
+                                            list.add(Integer.parseInt(shd.getCtrlNumber()));
+                                        }
+                                    }
+                                }
+                                for (String address : map.keySet()) {
+                                    List<Integer> lstCtrlNumbers = map.get(address);
+                                    String[] ipAndPort = address.split(":");
+                                    EioUtils.ctrlMultipleLight(ipAndPort[0], Integer.parseInt(ipAndPort[1]), lstCtrlNumbers, false);
+                                }
+                            }
+                            return Observable.just("success");
+                        }
+                        return Observable.just("fail");
+                    }
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
     /**
      * 通过RTU方式控灯
      *
@@ -220,22 +301,25 @@ public class MainRepository extends BaseRepository {
                                 //亮灯，先全暗，再亮
                                 Map<String, List<Integer>> lights = new HashMap<>();
                                 for (StoreHouseDevice shd : lstStoreHouseDevices) {
-                                    String[] controls = shd.getCtrlNumber().split("-");
-                                    rtuUtils.controlLight(Integer.parseInt(controls[0]), "00000");
-                                    String[] controlDrawers = shd.getDrawerIds().split(",");
-                                    //获取需要亮灯货架的地址位和机位
-                                    for (String drawerId : controlDrawers) {
-                                        if (drawerIds != null && drawerIds.contains(drawerId)) {
-                                            List<Integer> deCommand = lights.get(controls[0]);
-                                            if (deCommand == null) {
-                                                deCommand = new ArrayList<>();
-                                                lights.put(controls[0], deCommand);
-                                            }
-                                            if (!deCommand.contains(Integer.parseInt(controls[1]))) {
-                                                deCommand.add(Integer.parseInt(controls[1]));
+                                    if (!StringUtils.isEmpty(shd.getCtrlNumber())) {
+                                        String[] controls = shd.getCtrlNumber().split("-");
+                                        rtuUtils.controlLight(Integer.parseInt(controls[0]), "00000");
+                                        String[] controlDrawers = shd.getDrawerIds().split(",");
+                                        //获取需要亮灯货架的地址位和机位
+                                        for (String drawerId : controlDrawers) {
+                                            if (drawerIds != null && drawerIds.contains(drawerId)) {
+                                                List<Integer> deCommand = lights.get(controls[0]);
+                                                if (deCommand == null) {
+                                                    deCommand = new ArrayList<>();
+                                                    lights.put(controls[0], deCommand);
+                                                }
+                                                if (!deCommand.contains(Integer.parseInt(controls[1]))) {
+                                                    deCommand.add(Integer.parseInt(controls[1]));
+                                                }
                                             }
                                         }
                                     }
+
                                 }
                                 //亮灯
                                 for (String addrNumber : lights.keySet()) {

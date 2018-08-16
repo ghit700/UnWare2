@@ -82,11 +82,11 @@ public class EioUtils {
 	 */
 	public static void ctrlMultipleLight(String ip, Integer port, List<Integer> lightChannels,  List<Integer> darkChannels) {
 		Socket socket = connect(ip, port != null ? port : PORT);
-		for (int i = 0; i < lightChannels.size(); i++) {
-			EioUtils.ctrlSingleOutput(socket, lightChannels.get(i),  LIGHT_ON );
-		}
 		for (int i = 0; i < darkChannels.size(); i++) {
 			EioUtils.ctrlSingleOutput(socket, darkChannels.get(i),  LIGHT_OFF );
+		}
+		for (int i = 0; i < lightChannels.size(); i++) {
+			EioUtils.ctrlSingleOutput(socket, lightChannels.get(i),  LIGHT_ON );
 		}
 		disconnect(socket);
 	}
